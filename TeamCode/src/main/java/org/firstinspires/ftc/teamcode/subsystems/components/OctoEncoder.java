@@ -27,7 +27,7 @@ public class OctoEncoder implements OctoConstants {
         oq.setSingleEncoderDirection(encoderID, direction);
         oq.setChannelBankConfig(OctoQuadBase.ChannelBankConfig.ALL_PULSE_WIDTH);
         oq.setSingleChannelPulseWidthParams(encoderID, new OctoQuad.ChannelPulseWidthParams(MIN_PULSE_LENGTH_US, MAX_PULSE_LENGTH_US));
-        encoderFallingEdge = new EncoderFallingEdge( this::getRawPosition, this::getRawVelocity );
+        encoderFallingEdge = new EncoderFallingEdge(this::getRawPosition, this::getRawVelocity);
     }
 
     public int getPosition() {
@@ -39,12 +39,16 @@ public class OctoEncoder implements OctoConstants {
         encoderFallingEdge.reset();
     }
 
-    private int getRawPosition() {
+    public int getRawPosition() {
         return oq.readSinglePosition(encoderID);
     }
 
-    private int getRawVelocity() {
+    public int getRawVelocity() {
         return Short.valueOf(oq.readSingleVelocity(encoderID)).intValue();
+    }
+
+    public int getNumRotations() {
+        return encoderFallingEdge.getNumFullRotations();
     }
 
 }

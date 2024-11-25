@@ -50,7 +50,6 @@ public class Elevator implements ElevatorConstants {
     }
 
     public void periodic() {
-        slideEncoder.update();
         //if (slideMagnet.getState()) { slideEncoder.reset(); }
     }
 

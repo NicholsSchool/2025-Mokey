@@ -1,34 +1,39 @@
 package org.firstinspires.ftc.teamcode.math_utils;
 
+import org.firstinspires.ftc.teamcode.constants.OctoConstants;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
-public class EncoderFallingEdge
+public class EncoderFallingEdge implements OctoConstants
 {
     IntSupplier position;
     IntSupplier velocity;
 
-    public int numFullRotations = 0;
+    int numFullRotations;
+    double prevPosition;
 
-    public double prevPosition;
-    public EncoderFallingEdge(IntSupplier position, IntSupplier velocity ) {
+    public EncoderFallingEdge( IntSupplier position, IntSupplier velocity ) {
         this.position = position;
         this.velocity = velocity;
         prevPosition = 0.0;
+        numFullRotations = 0;
     }
 
-    public int calculatePosition()
-    {
-        if( velocity.getAsInt() > 0 && prevPosition > position.getAsInt() )
+    public int calculatePosition() {
+        if(prevPosition > 750 && position.getAsInt() < 200)
             numFullRotations++;
 
-        if( velocity.getAsInt() < 0 && prevPosition < position.getAsInt() )
+        if(prevPosition < 200 && position.getAsInt() > 750)
             numFullRotations--;
 
         prevPosition = position.getAsInt();
-        assert numFullRotations >= 0;
 
         return 1024 * numFullRotations + position.getAsInt();
+    }
+
+    public int getNumFullRotations() {
+        return numFullRotations;
     }
 
     public void reset()

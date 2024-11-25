@@ -47,7 +47,6 @@ public class Intake implements IntakeConstants {
     }
 
     public void periodic() {
-        slideEncoder.update();
         //if (slideMagnet.getState()) { slideEncoder.reset(); }
     }
 

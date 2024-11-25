@@ -42,6 +42,7 @@ public class DevTelemetry extends OpMode {
         dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        telemetry.setMsTransmissionInterval(50);
 
         controller1 = new Controller(gamepad1);
         controller2 = new Controller(gamepad2);
@@ -100,6 +101,9 @@ public class DevTelemetry extends OpMode {
 
             telemetry.addData("Slide Encoder Position", intake.getEncoderTicks());
             telemetry.addData("Wrist Servo Positions", intake.getWristServoPositions());
+            telemetry.addData("Slide Encoder Num Rotations", intake.slideEncoder.getNumRotations() );
+            telemetry.addData("Slide Encoder Raw Velocity", intake.slideEncoder.getRawVelocity() );
+            telemetry.addData("Slide Encoder Raw Position", intake.slideEncoder.getRawPosition() );
 
             telemetry.addLine("==============================\n");
         }
