@@ -43,10 +43,6 @@ public class Intake implements IntakeConstants {
         //colorSensor = hwMap.get(ColorSensor.class, "IntakeColor");
     }
 
-    public void periodic() {
-        //if (slideMagnet.getState()) { slideEncoder.reset(); }
-    }
-
     public int getEncoderPosition() { return slideEncoder.getPosition(); }
 
     public int getEncoderVelocity() { return slideEncoder.getVelocity(); }

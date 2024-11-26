@@ -9,7 +9,7 @@ public interface DrivetrainConstants {
     int RIGHT_DRIVE_ENC = 4;
     int BACK_DRIVE_ENC = 3;
     /** The Maximum Speed of the Driving Profile */
-    double DRIVE_PROFILE_SPEED = 3.0;
+    double DRIVE_PROFILE_SPEED = 10.0;
 
     /** The Maximum Speed of the Turning Profile */
     double TURN_PROFILE_SPEED = 1.0;
@@ -18,10 +18,10 @@ public interface DrivetrainConstants {
     double TURN_PROFILE_MAX = 0.25;
 
     /** Virtual Low Gear Max Speed */
-    double VIRTUAL_LOW_GEAR = 0.375;
+    double VIRTUAL_LOW_GEAR = 0.775;
 
     /** Virtual High Gear Max Speed */
-    double VIRTUAL_HIGH_GEAR = 0.75;
+    double VIRTUAL_HIGH_GEAR = 1;
 
     /** Auto Align Proportional Constant */
     double AUTO_ALIGN_P = 0.45;

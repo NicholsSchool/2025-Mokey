@@ -55,8 +55,7 @@ public class DevTelemetry extends OpMode {
 
         controller1.update();
         controller2.update();
-        intake.periodic();
-        elevator.periodic();
+        drivetrain.update();
 
         drivetrain.leftLight.setColour(IndicatorLight.Colour.ORANGE);
         drivetrain.rightLight.setColour(IndicatorLight.Colour.ORANGE);
@@ -75,17 +74,16 @@ public class DevTelemetry extends OpMode {
 
         elevator.slideRawPower(-controller2.leftStick.y.value());
         intake.slideRawPower(-controller2.rightStick.y.value());
-        elevator.setCarriageServoPower(controller2.leftTrigger.value() - controller2.rightTrigger.value());
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
-        drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.x.value(), false, true);
+        drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().angle(), controller1.rightStick.toVector().magnitude() > 0.5, true);
+
+//        drivetrain.runDriveMotors(controller1.leftStick.y.value());
 
         if (showDrivetrainTelem) {
             telemetry.addLine("==========DRIVETRAIN==========");
 
-            telemetry.addData("NavX Info", drivetrain.getNavxInfo());
-            telemetry.addData("NavX Yaw", drivetrain.getPose().angle);
-            telemetry.addData("x", drivetrain.getPose().x);
-            telemetry.addData("y", drivetrain.getPose().y);
+            telemetry.addData("Robot Pose", drivetrain.getPose().toString());
+            telemetry.addData("Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));
 
             telemetry.addLine("==============================\n");
         }

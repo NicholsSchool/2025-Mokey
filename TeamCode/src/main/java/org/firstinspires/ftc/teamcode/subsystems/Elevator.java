@@ -17,9 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 public class Elevator implements ElevatorConstants {
     private final DcMotorEx leftSlideMotor, rightSlideMotor;
     private final OctoEncoder slideEncoder;
-    private final CRServoImplEx leftCarriageServo;
-    private final CRServoImplEx rightCarriageServo;
-    // private final ColorSensor carriageSensor;
 
     /**
      * Initializes the Arm
@@ -35,20 +32,8 @@ public class Elevator implements ElevatorConstants {
         rightSlideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightSlideMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
-        leftCarriageServo = hardwareMap.get(CRServoImplEx.class, "LeftCarriage");
-        leftCarriageServo.setDirection(CRServoImplEx.Direction.FORWARD);
-
-        rightCarriageServo = hardwareMap.get(CRServoImplEx.class, "RightCarriage");
-        rightCarriageServo.setDirection(CRServoImplEx.Direction.REVERSE);
-
         slideEncoder = new OctoEncoder(hardwareMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.FORWARD);
         slideEncoder.reset();
-
-        // carriageSensor = hardwareMap.get(ColorSensor.class, "CarriageColor");
-    }
-
-    public void periodic() {
-        //if (slideMagnet.getState()) { slideEncoder.reset(); }
     }
 
     public int getEncoderPosition() { return slideEncoder.getPosition(); }
@@ -62,10 +47,5 @@ public class Elevator implements ElevatorConstants {
     public void slideRawPower(double power){
         leftSlideMotor.setPower(power);
         rightSlideMotor.setPower(power);
-    }
-
-    public void setCarriageServoPower(double inputPower) {
-        leftCarriageServo.setPower(inputPower);
-        rightCarriageServo.setPower(inputPower);
     }
 }
