@@ -32,7 +32,7 @@ public class Drivetrain implements DrivetrainConstants {
     private final VectorMotionProfile driveProfile;
     private final MotionProfile turnProfile;
     private final SimpleFeedbackController turnController;
-    private final RobotPose pose;
+    private RobotPose pose;
     private final boolean isBlueAlliance;
     private double imuOffset, targetHeading;
     private OpticalSensor od;
@@ -95,7 +95,10 @@ public class Drivetrain implements DrivetrainConstants {
         turnController = new SimpleFeedbackController(AUTO_ALIGN_P);
     }
 
-    public void update() { od.update(); }
+    public void update() {
+        od.update();
+        pose = new RobotPose(od.getPosition().x, od.getPosition().y, navx.getYaw() + imuOffset);
+    }
 
     /**
      * Drives the robot field oriented
@@ -133,13 +136,13 @@ public class Drivetrain implements DrivetrainConstants {
         backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
     }
 
-
     public boolean[] getNavxInfo() {
         return new boolean[]{navx.isConnected(), navx.isCalibrating()};
     }
 
-    public RobotPose getPose() {
-
-        return new RobotPose(od.getPosition().x, od.getPosition().y, navx.getYaw());
+    public int[] getMotorVelocities() {
+        return new int[]{leftEncoder.getVelocity(), rightEncoder.getVelocity(), backEncoder.getVelocity()};
     }
+
+    public RobotPose getPose() { return pose; }
 }

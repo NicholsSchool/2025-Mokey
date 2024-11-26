@@ -14,12 +14,11 @@ import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
 import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 public class Intake implements IntakeConstants {
-    public final DcMotorEx slide;
-    public final OctoEncoder slideEncoder;
-    public final ServoImplEx intakeWristF, intakeWristB;
-    public final CRServoImplEx intakeOne,intakeTwo;
+    private final DcMotorEx slide;
+    private final OctoEncoder slideEncoder;
+    private final ServoImplEx intakeWristF, intakeWristB;
+    private final CRServoImplEx intakeOne,intakeTwo;
     //public final ColorSensor colorSensor;
-    public final DigitalChannel slideMagnet;
 
     public Intake(HardwareMap hwMap) {
         slide = hwMap.get(DcMotorEx.class, "IntakeMotor");
@@ -27,6 +26,7 @@ public class Intake implements IntakeConstants {
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         slideEncoder = new OctoEncoder(hwMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.FORWARD);
+        slideEncoder.reset();
 
         intakeOne = hwMap.get(CRServoImplEx.class, "IntakeLeft");
         intakeTwo = hwMap.get(CRServoImplEx.class, "IntakeRight");
@@ -41,16 +41,15 @@ public class Intake implements IntakeConstants {
         intakeWristB.setDirection(Servo.Direction.FORWARD);
 
         //colorSensor = hwMap.get(ColorSensor.class, "IntakeColor");
-
-        slideMagnet = hwMap.get(DigitalChannel.class, "IntakeMagnet");
-
     }
 
     public void periodic() {
         //if (slideMagnet.getState()) { slideEncoder.reset(); }
     }
 
-    public int getEncoderTicks() { return slideEncoder.getPosition(); }
+    public int getEncoderPosition() { return slideEncoder.getPosition(); }
+
+    public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
     public double[] getWristServoPositions() {
         return new double[]{intakeWristF.getPosition(), intakeWristB.getPosition()};

@@ -15,6 +15,8 @@ import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 
+import java.util.Arrays;
+
 @TeleOp(name="Dev Telemetry", group="Dev")
 public class DevTelemetry extends OpMode {
 
@@ -91,7 +93,8 @@ public class DevTelemetry extends OpMode {
         if (showElevatorTelem) {
             telemetry.addLine("===========ELEVATOR===========");
 
-            telemetry.addData("Encoder Position", elevator.getEncoderTicks());
+            telemetry.addData("Elevator Encoder Position", elevator.getEncoderPosition());
+            telemetry.addData("Elevator Encoder Velocity", elevator.getEncoderVelocity());
 
             telemetry.addLine("==============================\n");
         }
@@ -99,11 +102,9 @@ public class DevTelemetry extends OpMode {
         if (showIntakeTelem) {
             telemetry.addLine("=============INTAKE===========");
 
-            telemetry.addData("Slide Encoder Position", intake.getEncoderTicks());
-            telemetry.addData("Wrist Servo Positions", intake.getWristServoPositions());
-            telemetry.addData("Slide Encoder Num Rotations", intake.slideEncoder.getNumRotations() );
-            telemetry.addData("Slide Encoder Raw Velocity", intake.slideEncoder.getRawVelocity() );
-            telemetry.addData("Slide Encoder Raw Position", intake.slideEncoder.getRawPosition() );
+            telemetry.addData("Wrist Servo Positions", Arrays.toString(intake.getWristServoPositions()));
+            telemetry.addData("Intake Encoder Velocity", intake.getEncoderVelocity() );
+            telemetry.addData("Intake Encoder Position", intake.getEncoderPosition() );
 
             telemetry.addLine("==============================\n");
         }

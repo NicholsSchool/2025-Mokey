@@ -20,7 +20,6 @@ public class Elevator implements ElevatorConstants {
     private final CRServoImplEx leftCarriageServo;
     private final CRServoImplEx rightCarriageServo;
     // private final ColorSensor carriageSensor;
-    private final DigitalChannel slideMagnet;
 
     /**
      * Initializes the Arm
@@ -43,17 +42,18 @@ public class Elevator implements ElevatorConstants {
         rightCarriageServo.setDirection(CRServoImplEx.Direction.REVERSE);
 
         slideEncoder = new OctoEncoder(hardwareMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.FORWARD);
+        slideEncoder.reset();
 
         // carriageSensor = hardwareMap.get(ColorSensor.class, "CarriageColor");
-
-        slideMagnet = hardwareMap.get(DigitalChannel.class, "LeftClimberMagnet");
     }
 
     public void periodic() {
         //if (slideMagnet.getState()) { slideEncoder.reset(); }
     }
 
-    public int getEncoderTicks() { return slideEncoder.getPosition(); }
+    public int getEncoderPosition() { return slideEncoder.getPosition(); }
+
+    public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
     public void setSlidePosition(double inputPosition) {
         //TODO: Use SimpleFeedbackController for this
