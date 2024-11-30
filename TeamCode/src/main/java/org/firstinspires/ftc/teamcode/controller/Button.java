@@ -32,6 +32,8 @@ public class Button {
         return isPressed && !wasPressed;
     }
 
+    public boolean wasJustReleased() { return !isPressed && wasPressed; }
+
     /**
      * The Button as a String
      *

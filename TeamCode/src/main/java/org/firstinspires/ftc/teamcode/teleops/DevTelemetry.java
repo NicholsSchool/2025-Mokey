@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.constants.IndicatorConstants;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 import org.firstinspires.ftc.teamcode.math_utils.Vector;
@@ -70,14 +71,34 @@ public class DevTelemetry extends OpMode {
         if (controller1.circle.wasJustPressed()) { showDrivetrainTelem = !showDrivetrainTelem; }
         if (controller1.triangle.wasJustPressed()) { showElevatorTelem = !showElevatorTelem; }
         if (controller1.square.wasJustPressed()) { showIntakeTelem = !showIntakeTelem; }
-        if (controller1.x.wasJustPressed()) { showOtherTelem = !showOtherTelem; }
 
-        elevator.slideRawPower(-controller2.leftStick.y.value());
-        intake.slideRawPower(-controller2.rightStick.y.value());
+        if (controller1.x.wasJustPressed()) drivetrain.resetIMU();
+
+        if (controller1.dpadRight.wasJustPressed()) drivetrain.setTargetHeading(0);
+        if (controller1.dpadLeft.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
+        if (controller1.dpadUp.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
+        if (controller1.dpadDown.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
+
+
+        if (controller2.x.wasJustPressed()) {
+            elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
+            elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, ElevatorConstants.SLIDE_D);
+        }
+
+        if (controller2.circle.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_READY);
+        if (controller2.circle.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_PULL);
+
+        if (controller2.triangle.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_READY);
+        if (controller2.triangle.wasJustReleased()) {
+            elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_PULL);
+            elevator.setPIDCoefficients(0.1, 0.0, 0.0); //MORE POWAHHHHHH
+        }
+
+        elevator.periodic();
+
+        intake.slideRawPower(0.02);
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
-        drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().angle(), controller1.rightStick.toVector().magnitude() > 0.5, true);
-
-//        drivetrain.runDriveMotors(controller1.leftStick.y.value());
+        drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, controller1.leftBumper.isPressed());
 
         if (showDrivetrainTelem) {
             telemetry.addLine("==========DRIVETRAIN==========");

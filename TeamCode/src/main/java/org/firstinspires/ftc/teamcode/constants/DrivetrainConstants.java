@@ -12,10 +12,10 @@ public interface DrivetrainConstants {
     double DRIVE_PROFILE_SPEED = 10.0;
 
     /** The Maximum Speed of the Turning Profile */
-    double TURN_PROFILE_SPEED = 1.0;
+    double TURN_PROFILE_SPEED = 5.0;
 
     /** The Maximum Output Value Magnitude of the Turning Profile */
-    double TURN_PROFILE_MAX = 0.25;
+    double TURN_PROFILE_MAX = 0.5;
 
     /** Virtual Low Gear Max Speed */
     double VIRTUAL_LOW_GEAR = 0.775;

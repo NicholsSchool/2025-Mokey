@@ -56,4 +56,6 @@ public class OpticalSensor {
         return pos.h;
     }
 
+    public void resetHeading() { otos.setPosition( new SparkFunOTOS.Pose2D( pos.x, pos.y, 0.0 ) ); }
+
 }

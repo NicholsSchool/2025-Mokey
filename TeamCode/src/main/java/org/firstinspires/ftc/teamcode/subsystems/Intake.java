@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
+import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 public class Intake implements IntakeConstants {
@@ -18,6 +19,9 @@ public class Intake implements IntakeConstants {
     private final OctoEncoder slideEncoder;
     private final ServoImplEx intakeWristF, intakeWristB;
     private final CRServoImplEx intakeOne,intakeTwo;
+
+    private double setpoint;
+    private final PIDController pidController;
     //public final ColorSensor colorSensor;
 
     public Intake(HardwareMap hwMap) {
@@ -25,7 +29,7 @@ public class Intake implements IntakeConstants {
         slide.setDirection(DcMotorEx.Direction.REVERSE);
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        slideEncoder = new OctoEncoder(hwMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.FORWARD);
+        slideEncoder = new OctoEncoder(hwMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.REVERSE);
         slideEncoder.reset();
 
         intakeOne = hwMap.get(CRServoImplEx.class, "IntakeLeft");
@@ -40,7 +44,17 @@ public class Intake implements IntakeConstants {
         intakeWristF.setDirection(Servo.Direction.FORWARD);
         intakeWristB.setDirection(Servo.Direction.FORWARD);
 
+        setpoint = 0.0;
+        pidController = new PIDController( INTAKE_P, 0.0, 0.0 );
+
+
         //colorSensor = hwMap.get(ColorSensor.class, "IntakeColor");
+    }
+
+    public void periodic() {
+        if (Math.abs(getEncoderPosition() - setpoint) > 1000) {
+            this.slideRawPower(-pidController.calculate(slideEncoder.getPosition(), setpoint));
+        }
     }
 
     public int getEncoderPosition() { return slideEncoder.getPosition(); }
@@ -56,8 +70,12 @@ public class Intake implements IntakeConstants {
         slide.setPower(power * SLIDE_SPEED);
     }
 
-    public void slideToPos(double pos){
-        //TODO: Use SimpleFeedbackController for this
+    public void setSetpoint(double setpoint){
+        this.setpoint = setpoint;
+    }
+
+    public void setPIDCoefficients(double kP, double kI, double kD) {
+        pidController.setPID(kP, kI, kD);
     }
 
     public void runIntake(double power){

@@ -47,7 +47,7 @@ public class Drivetrain implements DrivetrainConstants {
      * @param isBlue whether we are blue alliance
      */
     public Drivetrain(HardwareMap hwMap, double x, double y, double initialHeading, boolean isBlue) {
-        this.imuOffset = initialHeading + (isBlue ? 3 * Math.PI / 2: Math.PI / 2);
+        this.imuOffset = initialHeading + Math.PI;
         this.targetHeading = initialHeading;
         this.isBlueAlliance = isBlue;
         od = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.RADIANS);
@@ -99,17 +99,17 @@ public class Drivetrain implements DrivetrainConstants {
      * @param turn the turning input
      * @param lowGear whether to put the robot to virtual low gear
      */
-    public void drive(Vector driveInput, double turn, boolean autoAlign, boolean lowGear) {
-        if (autoAlign) targetHeading = turn;
-        turn = turnProfile.calculate(turnToAngle());
+    public void drive(Vector driveInput, double turn, boolean lowGear) {
+        targetHeading += turn * -0.04;
+        double turnCalculated = turnProfile.calculate(turnToAngle());
         driveInput = driveProfile.calculate(driveInput.clipMagnitude(
                 (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turn)));
         double power = driveInput.magnitude();
         double angle = driveInput.angle();
 
-        leftDrive.setPower(turn + power * Math.cos(angle + LEFT_DRIVE_OFFSET - pose.angle));
-        rightDrive.setPower(turn + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - pose.angle));
-        backDrive.setPower(turn + power * Math.cos(angle + BACK_DRIVE_OFFSET - pose.angle));
+        leftDrive.setPower(turnCalculated + power * Math.cos(angle + LEFT_DRIVE_OFFSET - pose.angle));
+        rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - pose.angle));
+        backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - pose.angle));
     }
 
     private double turnToAngle() {
@@ -138,4 +138,6 @@ public class Drivetrain implements DrivetrainConstants {
     }
 
     public RobotPose getPose() { return pose; }
+
+    public void resetIMU() { od.resetHeading(); }
 }

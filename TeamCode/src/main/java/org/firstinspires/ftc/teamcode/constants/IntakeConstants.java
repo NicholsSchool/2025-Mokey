@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.constants;
 
 public interface IntakeConstants {
-    double INTAKE_P = 0.1;
+    double INTAKE_P = 0.0001;
+    double INTAKE_D = 0.0;
     double INTAKE_FEEDBACK_MULTIPLIER = 1;
     
     double SLIDE_SPEED = 0.3;

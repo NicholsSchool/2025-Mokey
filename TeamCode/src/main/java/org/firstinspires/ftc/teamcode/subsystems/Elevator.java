@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
+import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 
@@ -17,6 +18,8 @@ import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 public class Elevator implements ElevatorConstants {
     private final DcMotorEx leftSlideMotor, rightSlideMotor;
     private final OctoEncoder slideEncoder;
+    private final PIDController pidController;
+    private double setpoint;
 
     /**
      * Initializes the Arm
@@ -34,14 +37,27 @@ public class Elevator implements ElevatorConstants {
 
         slideEncoder = new OctoEncoder(hardwareMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.FORWARD);
         slideEncoder.reset();
+
+        setpoint = 0.0;
+        pidController = new PIDController(SLIDE_P, 0.0, SLIDE_D);
+    }
+
+    public void periodic() {
+        if (Math.abs(getEncoderPosition() - setpoint) > 100) {
+            slideRawPower( -pidController.calculate( getEncoderPosition(), setpoint ) + 0.01);
+        }
     }
 
     public int getEncoderPosition() { return slideEncoder.getPosition(); }
 
     public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
-    public void setSlidePosition(double inputPosition) {
-        //TODO: Use SimpleFeedbackController for this
+    public void setSetpoint(double setpoint) {
+        this.setpoint = setpoint;
+    }
+
+    public void setPIDCoefficients(double kP, double kI, double kD) {
+        pidController.setPID(kP, kI, kD);
     }
 
     public void slideRawPower(double power){
