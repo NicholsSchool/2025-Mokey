@@ -47,7 +47,7 @@ public class Drivetrain implements DrivetrainConstants {
      * @param isBlue whether we are blue alliance
      */
     public Drivetrain(HardwareMap hwMap, double x, double y, double initialHeading, boolean isBlue) {
-        this.imuOffset = initialHeading;
+        this.imuOffset = initialHeading + (isBlue ? Math.PI : 0);
         this.targetHeading = initialHeading;
         this.isBlueAlliance = isBlue;
         od = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.RADIANS);
@@ -100,10 +100,11 @@ public class Drivetrain implements DrivetrainConstants {
      * @param lowGear whether to put the robot to virtual low gear
      */
     public void drive(Vector driveInput, double turn, boolean lowGear) {
-        targetHeading += turn * -0.04;
-        double turnCalculated = turnProfile.calculate(turnToAngle());
+        boolean isManualTurning = Math.abs(turn) < TURN_DEADBAND;
+        double turnCalculated = isManualTurning ? turnProfile.calculate(turnToAngle()) : turnProfile.calculate(turn);
+        if(isManualTurning){targetHeading = pose.angle;}
         driveInput = driveProfile.calculate(driveInput.clipMagnitude(
-                (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turn)));
+                (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turnCalculated)));
         double power = driveInput.magnitude();
         double angle = driveInput.angle();
 

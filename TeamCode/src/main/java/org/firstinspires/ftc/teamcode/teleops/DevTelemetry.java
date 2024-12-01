@@ -71,34 +71,34 @@ public class DevTelemetry extends OpMode {
 
         if (controller1.options.wasJustPressed()) drivetrain.resetIMU();
 
-        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
-        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
-        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
-        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
+//        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
+//        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
+//        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
+//        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
 
 
         if (controller2.x.wasJustPressed()) {
             elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
         }
 
-        if (controller2.rightBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_READY);
-        if (controller2.rightBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_PULL);
+        if (controller1.rightBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_READY);
+        if (controller1.rightBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_PULL);
 
-        if (controller2.leftBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_READY);
-        if (controller2.leftBumper.wasJustReleased()) {
-            elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_PULL);
-        }
+//        if (controller1.leftBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_READY);
+//        if (controller1.leftBumper.wasJustReleased()) {
+//            elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_PULL);
+//        }
         else elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, 0.0);
 
         elevator.periodic();
-
-        intake.setWristSetpoint( Range.clip( controller2.leftStick.toVector().y, 0.0, 1.0 ));
+//
+        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? 0.19 : 0);
         intake.setIntakeSetpoint( controller1.leftBumper.isPressed() ? 18000 : 1000 );
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
 
         intake.periodic();
 
-        drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, controller1.leftBumper.isPressed());
+        drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, false);
 
             telemetry.addData("Robot Pose", drivetrain.getPose().toString());
             telemetry.addData("Drive Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));

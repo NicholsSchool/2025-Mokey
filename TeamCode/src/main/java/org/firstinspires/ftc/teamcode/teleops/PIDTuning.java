@@ -23,8 +23,8 @@ public class PIDTuning extends OpMode {
 
     FtcDashboard dashboard;
 
-    public double intake_p = IntakeConstants.INTAKE_P;
-    public double intake_d = IntakeConstants.INTAKE_D;
+    public static double intake_p = IntakeConstants.INTAKE_P;
+    public static double intake_d = IntakeConstants.INTAKE_D;
 
     public double elevator_p = ElevatorConstants.SLIDE_P;
 
@@ -47,11 +47,11 @@ public class PIDTuning extends OpMode {
         intake.setPIDCoefficients(intake_p, 0.0, intake_d);
         elevator.setPIDCoefficients(elevator_p, 0.0, 0.0);
 
-        intake.setIntakeSetpoint( controller1.triangle.isPressed() ? 30000 : 10000 );
+        intake.setIntakeSetpoint( controller1.triangle.isPressed() ? 27000 : 1000 );
 
         elevator.setSetpoint( controller1.x.isPressed() ? 50000 : 10000 );
 
-        intake.setWristSetpoint( controller1.circle.isPressed() ? 0 : 1 );
+        intake.setWristSetpoint(0);
 
         telemetry.addData("intake desired", controller1.triangle.isPressed() ? 30000 : 10000);
         telemetry.addData("intake real", intake.getEncoderPosition());
@@ -60,7 +60,7 @@ public class PIDTuning extends OpMode {
         telemetry.addData("wrist desired",  controller1.circle.isPressed() ? 0 : 100 );
         telemetry.addData("wrist real", intake.getWristServoPositions()[0]);
 
-        //intake.periodic();
+        intake.periodic();
         elevator.periodic();
 
     }

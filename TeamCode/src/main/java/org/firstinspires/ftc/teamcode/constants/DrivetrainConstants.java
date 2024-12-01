@@ -61,4 +61,8 @@ public interface DrivetrainConstants {
 
     /** Forward Correction coefficient */
     double FORWARD_ODOMETRY_CORRECTION = 0.942379475317;
+    /** value the turning needs to be greater than to cancel autoAlign*/
+    double TURN_DEADBAND = 0.05;
+    /** value turn is multiplied by to get the actual turn value*/
+    double TURN_MULTIPLIER = 0.3;
 }

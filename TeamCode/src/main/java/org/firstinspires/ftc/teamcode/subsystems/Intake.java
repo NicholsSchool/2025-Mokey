@@ -76,7 +76,6 @@ public class Intake implements IntakeConstants {
     public double[] getWristServoPositions() {
         return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0 - 88.0, wristBEncoder.getVoltage() / 3.3 * 360.0 - 220.0} ;
     }
-
     public void slideRawPower(double power){
         slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         slide.setPower(power * SLIDE_SPEED);
