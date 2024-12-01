@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 public class Elevator implements ElevatorConstants {
     private final DcMotorEx leftSlideMotor, rightSlideMotor;
     private final OctoEncoder slideEncoder;
-    private final PIDController pidController;
+    public final PIDController pidController;
     private double setpoint;
 
     /**
@@ -39,13 +39,11 @@ public class Elevator implements ElevatorConstants {
         slideEncoder.reset();
 
         setpoint = 0.0;
-        pidController = new PIDController(SLIDE_P, 0.0, SLIDE_D);
+        pidController = new PIDController(SLIDE_P, 0.0, 0.0);
     }
 
     public void periodic() {
-        if (Math.abs(getEncoderPosition() - setpoint) > 100) {
-            slideRawPower( -pidController.calculate( getEncoderPosition(), setpoint ) + 0.01);
-        }
+        slideRawPower( -pidController.calculate( getEncoderPosition(), setpoint ));
     }
 
     public int getEncoderPosition() { return slideEncoder.getPosition(); }

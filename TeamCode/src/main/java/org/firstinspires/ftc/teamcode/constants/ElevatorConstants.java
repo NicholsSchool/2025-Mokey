@@ -6,13 +6,13 @@ public interface ElevatorConstants {
 
     int SLIDE_ENC_ID = 1;
 
-    double SLIDE_P = 2.5E-4;
-    double SLIDE_D = 1E-5;
+    double SLIDE_P = 2E-4;
+    double SLIDE_D = 2E-5;
 
-    int WAYPOINT_ZERO = 0;
+    int WAYPOINT_ZERO = 25;
     int WAYPOINT_CHAMBER_READY = 28000;
     int WAYPOINT_CHAMBER_PULL = 16000;
     int WAYPOINT_CLIMB_READY = 26000;
-    int WAYPOINT_CLIMB_PULL = 9000;
+    int WAYPOINT_CLIMB_PULL = 5000;
 
 }

@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.robotcore.util.Range;
 
 import java.util.Arrays;
 
@@ -38,7 +39,7 @@ public class DevTelemetry extends OpMode {
     @Override
     public void init() {
 
-        drivetrain = new Drivetrain(hardwareMap, 0, 0, 0, false);
+        drivetrain = new Drivetrain(hardwareMap, 0, 0, Math.PI, false);
         elevator = new Elevator(hardwareMap);
         intake = new Intake(hardwareMap);
 
@@ -68,66 +69,46 @@ public class DevTelemetry extends OpMode {
                 (showElevatorTelem ? " Elevator" : "") + (showIntakeTelem ? " Intake" : "") +
                 (showOtherTelem ? " Other" : ""));
 
-        if (controller1.circle.wasJustPressed()) { showDrivetrainTelem = !showDrivetrainTelem; }
-        if (controller1.triangle.wasJustPressed()) { showElevatorTelem = !showElevatorTelem; }
-        if (controller1.square.wasJustPressed()) { showIntakeTelem = !showIntakeTelem; }
+        if (controller1.options.wasJustPressed()) drivetrain.resetIMU();
 
-        if (controller1.x.wasJustPressed()) drivetrain.resetIMU();
-
-        if (controller1.dpadRight.wasJustPressed()) drivetrain.setTargetHeading(0);
-        if (controller1.dpadLeft.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
-        if (controller1.dpadUp.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
-        if (controller1.dpadDown.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
+        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
+        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
+        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
+        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
 
 
         if (controller2.x.wasJustPressed()) {
             elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
-            elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, ElevatorConstants.SLIDE_D);
         }
 
-        if (controller2.circle.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_READY);
-        if (controller2.circle.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_PULL);
+        if (controller2.rightBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_READY);
+        if (controller2.rightBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CHAMBER_PULL);
 
-        if (controller2.triangle.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_READY);
-        if (controller2.triangle.wasJustReleased()) {
+        if (controller2.leftBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_READY);
+        if (controller2.leftBumper.wasJustReleased()) {
             elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_PULL);
-            elevator.setPIDCoefficients(0.1, 0.0, 0.0); //MORE POWAHHHHHH
         }
+        else elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, 0.0);
 
         elevator.periodic();
 
-        intake.slideRawPower(0.02);
+        intake.setWristSetpoint( Range.clip( controller2.leftStick.toVector().y, 0.0, 1.0 ));
+        intake.setIntakeSetpoint( controller1.leftBumper.isPressed() ? 18000 : 1000 );
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
+
+        intake.periodic();
+
         drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, controller1.leftBumper.isPressed());
 
-        if (showDrivetrainTelem) {
-            telemetry.addLine("==========DRIVETRAIN==========");
-
             telemetry.addData("Robot Pose", drivetrain.getPose().toString());
-            telemetry.addData("Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));
+            telemetry.addData("Drive Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));
 
-            telemetry.addLine("==============================\n");
-        }
-
-        if (showElevatorTelem) {
-            telemetry.addLine("===========ELEVATOR===========");
-
+            telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
             telemetry.addData("Elevator Encoder Position", elevator.getEncoderPosition());
             telemetry.addData("Elevator Encoder Velocity", elevator.getEncoderVelocity());
-
-            telemetry.addLine("==============================\n");
-        }
-
-        if (showIntakeTelem) {
-            telemetry.addLine("=============INTAKE===========");
 
             telemetry.addData("Wrist Servo Positions", Arrays.toString(intake.getWristServoPositions()));
             telemetry.addData("Intake Encoder Velocity", intake.getEncoderVelocity() );
             telemetry.addData("Intake Encoder Position", intake.getEncoderPosition() );
-
-            telemetry.addLine("==============================\n");
-        }
-
-
     }
 }

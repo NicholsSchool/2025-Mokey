@@ -1,14 +1,11 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuadBase;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
@@ -17,11 +14,15 @@ import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 public class Intake implements IntakeConstants {
     private final DcMotorEx slide;
     private final OctoEncoder slideEncoder;
-    private final ServoImplEx intakeWristF, intakeWristB;
+    private final CRServoImplEx intakeWristF, intakeWristB;
     private final CRServoImplEx intakeOne,intakeTwo;
+    private final AnalogInput wristFEncoder, wristBEncoder;
 
-    private double setpoint;
-    private final PIDController pidController;
+    private double intakeSetpoint;
+    private double wristSetpoint;
+    private final PIDController slidePid;
+    private final PIDController wristFPid;
+    private final PIDController wristBPid;
     //public final ColorSensor colorSensor;
 
     public Intake(HardwareMap hwMap) {
@@ -38,23 +39,34 @@ public class Intake implements IntakeConstants {
         intakeOne.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeTwo.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        intakeWristF = hwMap.get(ServoImplEx.class, "WristFront");
-        intakeWristB = hwMap.get(ServoImplEx.class, "WristBack");
+        intakeWristF = hwMap.get(CRServoImplEx.class, "WristFront");
+        intakeWristB = hwMap.get(CRServoImplEx.class, "WristBack");
 
-        intakeWristF.setDirection(Servo.Direction.FORWARD);
-        intakeWristB.setDirection(Servo.Direction.FORWARD);
+        intakeWristF.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeWristB.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        setpoint = 0.0;
-        pidController = new PIDController( INTAKE_P, 0.0, 0.0 );
+        wristFEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
+        wristBEncoder = hwMap.get(AnalogInput.class, "WristBackEncoder");
+
+        wristSetpoint = 0;
+        wristFPid = new PIDController( 0.005, 0.0, 0.0 );
+        wristBPid = new PIDController( 0.005, 0.0,0.0);
+// 88,220
+//186, 318
+        intakeSetpoint = 0.0;
+        slidePid = new PIDController( INTAKE_P, 0.0, 0.0 );
 
 
         //colorSensor = hwMap.get(ColorSensor.class, "IntakeColor");
     }
 
     public void periodic() {
-        if (Math.abs(getEncoderPosition() - setpoint) > 1000) {
-            this.slideRawPower(-pidController.calculate(slideEncoder.getPosition(), setpoint));
+        if (Math.abs(getEncoderPosition() - intakeSetpoint) > 1000) {
+            this.slideRawPower(-slidePid.calculate(slideEncoder.getPosition(), intakeSetpoint));
         }
+
+        intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], wristSetpoint ) );
+        intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint ) );
     }
 
     public int getEncoderPosition() { return slideEncoder.getPosition(); }
@@ -62,7 +74,7 @@ public class Intake implements IntakeConstants {
     public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
     public double[] getWristServoPositions() {
-        return new double[]{intakeWristF.getPosition(), intakeWristB.getPosition()};
+        return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0 - 88.0, wristBEncoder.getVoltage() / 3.3 * 360.0 - 220.0} ;
     }
 
     public void slideRawPower(double power){
@@ -70,12 +82,12 @@ public class Intake implements IntakeConstants {
         slide.setPower(power * SLIDE_SPEED);
     }
 
-    public void setSetpoint(double setpoint){
-        this.setpoint = setpoint;
+    public void setIntakeSetpoint(double intakeSetpoint){
+        this.intakeSetpoint = intakeSetpoint;
     }
 
     public void setPIDCoefficients(double kP, double kI, double kD) {
-        pidController.setPID(kP, kI, kD);
+        slidePid.setPID(kP, kI, kD);
     }
 
     public void runIntake(double power){
@@ -83,9 +95,12 @@ public class Intake implements IntakeConstants {
         intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
-    public void wristToPos(double pos){
-        intakeWristF.setPosition(pos);
-        intakeWristB.setPosition(pos);
+    /**
+     * Between 0 and 1 please
+     * @param pos
+     */
+    public void setWristSetpoint(double pos){
+        wristSetpoint = pos * 100;
     }
 
 }

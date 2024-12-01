@@ -47,7 +47,7 @@ public class Drivetrain implements DrivetrainConstants {
      * @param isBlue whether we are blue alliance
      */
     public Drivetrain(HardwareMap hwMap, double x, double y, double initialHeading, boolean isBlue) {
-        this.imuOffset = initialHeading + Math.PI;
+        this.imuOffset = initialHeading;
         this.targetHeading = initialHeading;
         this.isBlueAlliance = isBlue;
         od = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.RADIANS);
@@ -89,7 +89,7 @@ public class Drivetrain implements DrivetrainConstants {
 
     public void update() {
         od.update();
-        pose = new RobotPose(od.getPosition().x, od.getPosition().y, od.getHeading());
+        pose = new RobotPose(od.getPosition().x, od.getPosition().y, od.getHeading() + imuOffset );
     }
 
     /**
