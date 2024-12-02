@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
 import org.firstinspires.ftc.teamcode.controller.Controller;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
@@ -17,6 +18,7 @@ import java.util.Arrays;
 @TeleOp(name = "PIDTuning", group = "Dev")
 public class PIDTuning extends OpMode {
 
+    private Drivetrain drivetrain;
     private Intake intake;
     private Elevator elevator;
     private Controller controller1;
@@ -30,8 +32,9 @@ public class PIDTuning extends OpMode {
 
     public void init() {
 
+        drivetrain = new Drivetrain(hardwareMap, 0, 0, Math.PI, false);
         intake = new Intake(hardwareMap);
-        elevator = new Elevator(hardwareMap);
+        elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
         controller1 = new Controller( gamepad1 );
 
         dashboard = FtcDashboard.getInstance();

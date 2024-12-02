@@ -141,4 +141,8 @@ public class Drivetrain implements DrivetrainConstants {
     public RobotPose getPose() { return pose; }
 
     public void resetIMU() { od.resetHeading(); }
+
+    public int getElevatorPosition() {
+        return rightDrive.getCurrentPosition();
+    }
 }

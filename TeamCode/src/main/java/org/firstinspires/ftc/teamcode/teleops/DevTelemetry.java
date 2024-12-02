@@ -40,7 +40,7 @@ public class DevTelemetry extends OpMode {
     public void init() {
 
         drivetrain = new Drivetrain(hardwareMap, 0, 0, Math.PI, false);
-        elevator = new Elevator(hardwareMap);
+        elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
         intake = new Intake(hardwareMap);
 
         dashboard = FtcDashboard.getInstance();
@@ -88,7 +88,7 @@ public class DevTelemetry extends OpMode {
 //        if (controller1.leftBumper.wasJustReleased()) {
 //            elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_PULL);
 //        }
-        else elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, 0.0);
+        // else elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, 0.0);
 
         elevator.periodic();
 //
@@ -105,7 +105,6 @@ public class DevTelemetry extends OpMode {
 
             telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
             telemetry.addData("Elevator Encoder Position", elevator.getEncoderPosition());
-            telemetry.addData("Elevator Encoder Velocity", elevator.getEncoderVelocity());
 
             telemetry.addData("Wrist Servo Positions", Arrays.toString(intake.getWristServoPositions()));
             telemetry.addData("Intake Encoder Velocity", intake.getEncoderVelocity() );

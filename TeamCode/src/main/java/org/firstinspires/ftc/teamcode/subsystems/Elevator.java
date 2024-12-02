@@ -11,13 +11,16 @@ import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+
 
 /**
  * Robot Arm
  */
 public class Elevator implements ElevatorConstants {
     private final DcMotorEx leftSlideMotor, rightSlideMotor;
-    private final OctoEncoder slideEncoder;
+    private final IntSupplier elevatorPosition;
     public final PIDController pidController;
     private double setpoint;
 
@@ -26,7 +29,7 @@ public class Elevator implements ElevatorConstants {
      *
      * @param hardwareMap the hardware map
      */
-    public Elevator(HardwareMap hardwareMap) {
+    public Elevator(HardwareMap hardwareMap, IntSupplier elevatorPosition ) {
         leftSlideMotor = hardwareMap.get(DcMotorEx.class, "LeftClimberMotor");
         leftSlideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         leftSlideMotor.setDirection(DcMotorEx.Direction.REVERSE);
@@ -35,20 +38,18 @@ public class Elevator implements ElevatorConstants {
         rightSlideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightSlideMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
-        slideEncoder = new OctoEncoder(hardwareMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.FORWARD);
-        slideEncoder.reset();
 
         setpoint = 0.0;
         pidController = new PIDController(SLIDE_P, 0.0, 0.0);
+        this.elevatorPosition = elevatorPosition;
     }
 
     public void periodic() {
-        slideRawPower( -pidController.calculate( getEncoderPosition(), setpoint ));
+        slideRawPower( -pidController.calculate( this.getEncoderPosition(), setpoint ));
     }
 
-    public int getEncoderPosition() { return slideEncoder.getPosition(); }
+    public int getEncoderPosition() { return elevatorPosition.getAsInt(); }
 
-    public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
     public void setSetpoint(double setpoint) {
         this.setpoint = setpoint;
