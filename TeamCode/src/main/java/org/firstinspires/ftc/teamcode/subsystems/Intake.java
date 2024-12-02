@@ -61,9 +61,9 @@ public class Intake implements IntakeConstants {
     }
 
     public void periodic() {
-        if (Math.abs(getEncoderPosition() - intakeSetpoint) > 1000) {
-            this.slideRawPower(-slidePid.calculate(slideEncoder.getPosition(), intakeSetpoint));
-        }
+//        if (Math.abs(getEncoderPosition() - intakeSetpoint) > 1000) {
+//            this.slideRawPower(-slidePid.calculate(slideEncoder.getPosition(), intakeSetpoint));
+//        }
 
         intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], wristSetpoint ) );
         intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint ) );

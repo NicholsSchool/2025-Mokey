@@ -77,7 +77,7 @@ public class DevTelemetry extends OpMode {
 //        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
 
 
-        if (controller2.x.wasJustPressed()) {
+        if (controller1.x.wasJustPressed()) {
             elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
         }
 
@@ -92,8 +92,8 @@ public class DevTelemetry extends OpMode {
 
         elevator.periodic();
 //
-        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? 0.19 : 0);
-        intake.setIntakeSetpoint( controller1.leftBumper.isPressed() ? 18000 : 1000 );
+        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? 0.5 : 0);
+        intake.slideRawPower(controller1.rightStick.toVector().y);
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
 
         intake.periodic();
