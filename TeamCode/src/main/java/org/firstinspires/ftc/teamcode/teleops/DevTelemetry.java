@@ -101,13 +101,13 @@ public class DevTelemetry extends OpMode {
         drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, false);
 
             telemetry.addData("Robot Pose", drivetrain.getPose().toString());
-            telemetry.addData("Drive Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));
+            //telemetry.addData("Drive Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));
 
             telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
             telemetry.addData("Elevator Encoder Position", elevator.getEncoderPosition());
 
             telemetry.addData("Wrist Servo Positions", Arrays.toString(intake.getWristServoPositions()));
-            telemetry.addData("Intake Encoder Velocity", intake.getEncoderVelocity() );
-            telemetry.addData("Intake Encoder Position", intake.getEncoderPosition() );
+//            telemetry.addData("Intake Encoder Velocity", intake.getEncoderVelocity() );
+//            telemetry.addData("Intake Encoder Position", intake.getEncoderPosition() );
     }
 }

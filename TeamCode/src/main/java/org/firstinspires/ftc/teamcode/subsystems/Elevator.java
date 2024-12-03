@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
-import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;

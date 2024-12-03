@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.math_utils.RobotPose;
 import org.firstinspires.ftc.teamcode.math_utils.SimpleFeedbackController;
 import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 import org.firstinspires.ftc.teamcode.subsystems.components.OpticalSensor;
-import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
+//import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 import com.kauailabs.navx.ftc.AHRS;
 import com.qualcomm.hardware.digitalchickenlabs.OctoQuadBase;
@@ -27,7 +27,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  */
 public class Drivetrain implements DrivetrainConstants {
     private final DcMotorEx leftDrive, rightDrive, backDrive;
-    private final OctoEncoder leftEncoder, rightEncoder, backEncoder;
+//    private final leftEncoder, rightEncoder, backEncoder;
     public final IndicatorLight leftLight, rightLight;
     private final VectorMotionProfile driveProfile;
     private final MotionProfile turnProfile;
@@ -74,10 +74,10 @@ public class Drivetrain implements DrivetrainConstants {
         rightDrive.setVelocityPIDFCoefficients(DRIVE_P, DRIVE_I, 0.0, 0.0);
         backDrive.setVelocityPIDFCoefficients(DRIVE_P, DRIVE_I, 0.0, 0.0);
 
-
-        leftEncoder = new OctoEncoder(hwMap, LEFT_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
-        rightEncoder = new OctoEncoder(hwMap, RIGHT_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
-        backEncoder = new OctoEncoder(hwMap, BACK_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
+//
+//        leftEncoder = new OctoEncoder(hwMap, LEFT_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
+//        rightEncoder = new OctoEncoder(hwMap, RIGHT_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
+//        backEncoder = new OctoEncoder(hwMap, BACK_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
 
         leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.GREEN);
         rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.GREEN);
@@ -128,9 +128,9 @@ public class Drivetrain implements DrivetrainConstants {
         backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
     }
 
-    public int[] getMotorVelocities() {
-        return new int[]{leftEncoder.getVelocity(), rightEncoder.getVelocity(), backEncoder.getVelocity()};
-    }
+//    public int[] getMotorVelocities() {
+//        return new int[]{leftEncoder.getVelocity(), rightEncoder.getVelocity(), backEncoder.getVelocity()};
+//    }
 
     public void runDriveMotors(double power){
         leftDrive.setPower(power);

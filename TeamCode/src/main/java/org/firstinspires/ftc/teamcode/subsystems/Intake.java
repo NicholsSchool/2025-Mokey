@@ -9,11 +9,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
-import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
+//import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 public class Intake implements IntakeConstants {
     private final DcMotorEx slide;
-    private final OctoEncoder slideEncoder;
+//    private final OctoEncoder slideEncoder;
     private final CRServoImplEx intakeWristF, intakeWristB;
     private final CRServoImplEx intakeOne,intakeTwo;
     private final AnalogInput wristFEncoder, wristBEncoder;
@@ -30,8 +30,8 @@ public class Intake implements IntakeConstants {
         slide.setDirection(DcMotorEx.Direction.REVERSE);
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        slideEncoder = new OctoEncoder(hwMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.REVERSE);
-        slideEncoder.reset();
+//        slideEncoder = new OctoEncoder(hwMap, SLIDE_ENC_ID, OctoQuadBase.EncoderDirection.REVERSE);
+//        slideEncoder.reset();
 
         intakeOne = hwMap.get(CRServoImplEx.class, "IntakeLeft");
         intakeTwo = hwMap.get(CRServoImplEx.class, "IntakeRight");
@@ -69,9 +69,9 @@ public class Intake implements IntakeConstants {
         intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint ) );
     }
 
-    public int getEncoderPosition() { return slideEncoder.getPosition(); }
-
-    public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
+//    public int getEncoderPosition() { return slideEncoder.getPosition(); }
+//
+//    public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
     public double[] getWristServoPositions() {
         return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0 - 88.0, wristBEncoder.getVoltage() / 3.3 * 360.0 - 220.0} ;
