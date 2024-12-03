@@ -54,8 +54,6 @@ public class PIDTuning extends OpMode {
 
         elevator.setSetpoint( controller1.x.isPressed() ? 50000 : 10000 );
 
-        intake.setWristSetpoint(0);
-
         telemetry.addData("intake desired", controller1.triangle.isPressed() ? 30000 : 10000);
         //telemetry.addData("intake real", intake.getEncoderPosition());
         telemetry.addData("elevator desired", controller1.x.isPressed() ? 50000 : 10000 );

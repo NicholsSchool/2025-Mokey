@@ -91,8 +91,8 @@ public class DevTelemetry extends OpMode {
         // else elevator.setPIDCoefficients(ElevatorConstants.SLIDE_P, 0.0, 0.0);
 
         elevator.periodic();
-//
-        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? 0.5 : 0);
+
+        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? Intake.WRIST_STATE.OUT: Intake.WRIST_STATE.IN );
         intake.slideRawPower(controller1.rightStick.toVector().y);
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
 

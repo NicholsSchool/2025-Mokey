@@ -22,4 +22,9 @@ public interface IntakeConstants {
     int CSENS_BLUE_R = 20;
     int CSENS_BLUE_G = 20;
     int CSENS_BLUE_B = 1000;
+
+    double INTAKE_WRIST_FRONT_IN = 40.0;
+    double INTAKE_WRIST_FRONT_OUT = 240.0;
+    double INTAKE_WRIST_BACK_IN = 51.0;
+    double INTAKE_WRIST_BACK_OUT = 184.0;
 }

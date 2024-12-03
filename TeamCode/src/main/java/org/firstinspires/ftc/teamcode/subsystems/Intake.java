@@ -48,7 +48,7 @@ public class Intake implements IntakeConstants {
         wristFEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
         wristBEncoder = hwMap.get(AnalogInput.class, "WristBackEncoder");
 
-        wristSetpoint = 0;
+        wristSetpoint = INTAKE_WRIST_FRONT_IN;
         wristFPid = new PIDController( 0.005, 0.0, 0.0 );
         wristBPid = new PIDController( 0.005, 0.0,0.0);
 // 88,220
@@ -65,8 +65,8 @@ public class Intake implements IntakeConstants {
 //            this.slideRawPower(-slidePid.calculate(slideEncoder.getPosition(), intakeSetpoint));
 //        }
 
-        intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], wristSetpoint ) );
-        intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint ) );
+      intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint + 200 ) % 360) );
+      intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint + 25 ) );
     }
 
 //    public int getEncoderPosition() { return slideEncoder.getPosition(); }
@@ -74,7 +74,7 @@ public class Intake implements IntakeConstants {
 //    public int getEncoderVelocity() { return slideEncoder.getVelocity(); }
 
     public double[] getWristServoPositions() {
-        return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0 - 88.0, wristBEncoder.getVoltage() / 3.3 * 360.0 - 220.0} ;
+        return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0, wristBEncoder.getVoltage() / 3.3 * 360.0} ;
     }
     public void slideRawPower(double power){
         slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -94,12 +94,21 @@ public class Intake implements IntakeConstants {
         intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
-    /**
-     * Between 0 and 1 please
-     * @param pos
-     */
-    public void setWristSetpoint(double pos){
-        wristSetpoint = pos * 100;
+    public void setWristSetpoint(WRIST_STATE wristState){
+        switch( wristState )
+        {
+            case IN:
+                wristSetpoint = INTAKE_WRIST_FRONT_IN;
+                break;
+            case OUT:
+                wristSetpoint = INTAKE_WRIST_FRONT_OUT;
+                break;
+        }
+    }
+
+    public enum WRIST_STATE {
+        IN,
+        OUT
     }
 
 }
