@@ -6,16 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
-import org.firstinspires.ftc.teamcode.constants.IndicatorConstants;
 import org.firstinspires.ftc.teamcode.controller.Controller;
-import org.firstinspires.ftc.teamcode.math_utils.Vector;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.qualcomm.robotcore.util.Range;
 
 import java.util.Arrays;
 
@@ -92,7 +89,7 @@ public class DevTelemetry extends OpMode {
 
         elevator.periodic();
 
-        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? Intake.WRIST_STATE.OUT: Intake.WRIST_STATE.IN );
+        intake.setWristSetpoint(controller1.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
         intake.slideRawPower(controller1.rightStick.toVector().y);
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
 

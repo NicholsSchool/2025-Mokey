@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.hardware.digitalchickenlabs.OctoQuadBase;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -65,8 +64,8 @@ public class Intake implements IntakeConstants {
 //            this.slideRawPower(-slidePid.calculate(slideEncoder.getPosition(), intakeSetpoint));
 //        }
 
-      intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint + 200 ) % 360) );
-      intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint + 25 ) );
+      intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
+      intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint - 65) );
     }
 
 //    public int getEncoderPosition() { return slideEncoder.getPosition(); }
@@ -94,7 +93,7 @@ public class Intake implements IntakeConstants {
         intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
-    public void setWristSetpoint(WRIST_STATE wristState){
+    public void setWristSetpoint(WristState wristState){
         switch( wristState )
         {
             case IN:
@@ -106,7 +105,7 @@ public class Intake implements IntakeConstants {
         }
     }
 
-    public enum WRIST_STATE {
+    public enum WristState {
         IN,
         OUT
     }
