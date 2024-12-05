@@ -50,7 +50,7 @@ public class Drivetrain implements DrivetrainConstants {
         this.imuOffset = initialHeading + (isBlue ? Math.PI : 0);
         this.targetHeading = initialHeading;
         this.isBlueAlliance = isBlue;
-        od = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.RADIANS);
+        od = new OpticalSensor("OTOS", hwMap, DistanceUnit.INCH, AngleUnit.RADIANS);
         pose = new RobotPose(x, y, initialHeading);
 
 

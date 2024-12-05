@@ -1,17 +1,10 @@
 package org.firstinspires.ftc.teamcode.constants;
 
 public interface IntakeConstants {
-    double INTAKE_P = 0.0001;
-    double INTAKE_D = 0.0;
-    double INTAKE_FEEDBACK_MULTIPLIER = 1;
+    double SLIDE_P = 0.0001;
     
     double SLIDE_SPEED = 0.3;
-    int SLIDE_ENC_ID = 0;
-    int SLIDE_TICKS = 100; //Measured in Ticks Per Centimeter
-
     double INTAKE_SPEED = 0.5;
-    double INTAKE_DELTA_LENGTH = 1;
-    double INTAKE_DELTA_THETA = 0.5;
 
     // Colour sensor constants for red sample
     int CSENS_RED_R = 1000;
@@ -23,8 +16,7 @@ public interface IntakeConstants {
     int CSENS_BLUE_G = 20;
     int CSENS_BLUE_B = 1000;
 
-    double INTAKE_WRIST_FRONT_IN = 161.0;
-    double INTAKE_WRIST_FRONT_OUT = 350.0;
-    double INTAKE_WRIST_BACK_IN = 51.0;
-    double INTAKE_WRIST_BACK_OUT = 184.0;
+    double INTAKE_WRIST_FRONT_IN = 280.0;
+    double INTAKE_WRIST_FRONT_OUT = 210.0;
+    double INTAKE_LIMIT = -100;
 }

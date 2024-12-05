@@ -13,8 +13,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
-import java.util.Arrays;
-
 @TeleOp(name = "PIDTuning", group = "Dev")
 public class PIDTuning extends OpMode {
 
@@ -25,9 +23,7 @@ public class PIDTuning extends OpMode {
 
     FtcDashboard dashboard;
 
-    public static double intake_p = IntakeConstants.INTAKE_P;
-    public static double intake_d = IntakeConstants.INTAKE_D;
-
+    public double intake_p = IntakeConstants.SLIDE_P;
     public double elevator_p = ElevatorConstants.SLIDE_P;
 
     public void init() {
@@ -47,7 +43,7 @@ public class PIDTuning extends OpMode {
 
         controller1.update();
 
-        intake.setPIDCoefficients(intake_p, 0.0, intake_d);
+        intake.setPIDCoefficients(intake_p, 0.0, 0.0);
         elevator.setPIDCoefficients(elevator_p, 0.0, 0.0);
 
         intake.setIntakeSetpoint( controller1.triangle.isPressed() ? 27000 : 1000 );
@@ -55,7 +51,7 @@ public class PIDTuning extends OpMode {
         elevator.setSetpoint( controller1.x.isPressed() ? 50000 : 10000 );
 
         telemetry.addData("intake desired", controller1.triangle.isPressed() ? 30000 : 10000);
-        //telemetry.addData("intake real", intake.getEncoderPosition());
+        telemetry.addData("intake real", intake.getEncoderPosition());
         telemetry.addData("elevator desired", controller1.x.isPressed() ? 50000 : 10000 );
         telemetry.addData("elevator real", elevator.getEncoderPosition());
         telemetry.addData("wrist desired",  controller1.circle.isPressed() ? 0 : 100 );
