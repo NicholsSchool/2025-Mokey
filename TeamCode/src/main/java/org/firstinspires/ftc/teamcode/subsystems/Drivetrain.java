@@ -89,7 +89,7 @@ public class Drivetrain implements DrivetrainConstants {
 
     public void update() {
         od.update();
-        pose = new RobotPose(od.getPosition().x, od.getPosition().y, od.getHeading() + imuOffset );
+        pose = new RobotPose(-od.getPosition().x, -od.getPosition().y, od.getHeading() + imuOffset );
     }
 
     /**

@@ -102,7 +102,7 @@ public class LerpPathPlanning implements SplineConstants {
             vx = optimalX() - robotPosition.x;
             vy = lineProjection(optimalX()) - robotPosition.y;
         }
-        Vector driveVector =  new Vector(vx, vy);
+        Vector driveVector =  new Vector(vx * 0.3, -vy * 0.3);
 
         boolean isFinished;
         if(error >= 0.05) {

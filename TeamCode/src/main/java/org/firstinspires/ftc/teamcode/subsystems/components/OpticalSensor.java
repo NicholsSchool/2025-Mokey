@@ -27,6 +27,7 @@ public class OpticalSensor {
 
         otos.begin();
         otos.resetTracking();
+//        otos.setAngularScalar(1.0008);
         otos.setLinearUnit(linearUnit);
         otos.setAngularUnit(angularUnit);
         otos.calibrateImu();

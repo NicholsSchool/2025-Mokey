@@ -99,7 +99,7 @@ public class DevTelemetry extends OpMode {
 
             telemetry.addData("Robot Pose", drivetrain.getPose().toString());
             //telemetry.addData("Drive Motor Velocities", Arrays.toString(drivetrain.getMotorVelocities()));
-
+            telemetry.addData("yaw", drivetrain.getPose().angle * 180 / Math.PI);
             telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
             telemetry.addData("Elevator Encoder Position", elevator.getEncoderPosition());
 
