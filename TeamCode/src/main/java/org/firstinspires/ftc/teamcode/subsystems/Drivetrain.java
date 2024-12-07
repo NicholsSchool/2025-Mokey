@@ -112,7 +112,7 @@ public class Drivetrain implements DrivetrainConstants {
         rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - pose.angle));
         backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - pose.angle));
     }
-
+ 
     private double turnToAngle() {
         double error = Angles.clipRadians(pose.angle - targetHeading);
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : turnController.calculate(error);
