@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Testing Auto for Lerp
  */
-@Autonomous(name="Lerp Testing", group="Testing")
+@Autonomous(name="Contest Auto", group="Testing")
 public class Auto extends LinearOpMode{
 
     @Override
