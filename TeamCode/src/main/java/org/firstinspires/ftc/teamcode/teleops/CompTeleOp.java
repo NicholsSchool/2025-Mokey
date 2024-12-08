@@ -68,10 +68,10 @@ public class CompTeleOp extends OpMode {
 
         if (controller1.options.wasJustPressed()) drivetrain.resetIMU();
 
-//        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
-//        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
-//        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
-//        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
+        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
+        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
+        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
+        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
 
 
         if (controller2.x.wasJustPressed()) {

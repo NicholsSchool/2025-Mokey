@@ -100,9 +100,9 @@ public class Drivetrain implements DrivetrainConstants {
      * @param lowGear whether to put the robot to virtual low gear
      */
     public void drive(Vector driveInput, double turn, boolean lowGear) {
-        boolean isManualTurning = Math.abs(turn) < TURN_DEADBAND;
-        double turnCalculated = isManualTurning ? turnToAngle() : turnProfile.calculate(turn);
-        if(isManualTurning){targetHeading = pose.angle;}
+        boolean isManualTurning = Math.abs(turn) > TURN_DEADBAND;
+//        double turnCalculated = !isManualTurning ? turnToAngle() : turnProfile.calculate(turn);
+        double turnCalculated = turnProfile.calculate(turn);
         driveInput = driveProfile.calculate(driveInput.clipMagnitude(
                 (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turnCalculated)));
         double power = driveInput.magnitude();
@@ -113,9 +113,9 @@ public class Drivetrain implements DrivetrainConstants {
         backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - pose.angle));
     }
  
-    private double turnToAngle() {
+    public double turnToAngle() {
         double error = Angles.clipRadians(pose.angle - targetHeading);
-        return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : turnController.calculate(error);
+        return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error / 3;
     }
 
     public void setTargetHeading(double targetHeading) {

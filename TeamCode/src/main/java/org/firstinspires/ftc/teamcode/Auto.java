@@ -41,10 +41,13 @@ public class Auto extends LinearOpMode{
 //            telemetry.addData("driveY", (24 - drivetrain.getPose().y) / mag);
 //            telemetry.update();
 //        }
+        while(time.time(TimeUnit.SECONDS) < 15){
+            drivetrain.drive(new Vector(0.0,0.0), 0, true);
+        }
         drivetrain.setTargetHeading(drivetrain.getPose().angle);
         elevator.setSetpoint(ElevatorConstants.WAYPOINT_READY);
         while(time.time(TimeUnit.SECONDS) < 5.0){
-            drivetrain.drive(new Vector(0.0,0.7), 0, true);
+            drivetrain.drive(new Vector(0.0,0.7), drivetrain.turnToAngle(), true);
             elevator.periodic();
             drivetrain.update();
         }
@@ -55,9 +58,8 @@ public class Auto extends LinearOpMode{
         }
         time.reset();
         elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
-        drivetrain.setTargetHeading(Math.PI / 2);
         while(time.time(TimeUnit.SECONDS) < 3.0){
-            drivetrain.drive(new Vector(0.8,-0.5), 0.0, true);
+            drivetrain.drive(new Vector(0.8,-0.5), drivetrain.turnToAngle() , true);
             drivetrain.update();
             elevator.periodic();
         }
