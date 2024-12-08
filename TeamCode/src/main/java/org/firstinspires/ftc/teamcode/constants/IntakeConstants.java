@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.constants;
 public interface IntakeConstants {
     double SLIDE_P = 0.0001;
     
-    double SLIDE_SPEED = 0.3;
+    double SLIDE_SPEED = 0.8;
     double INTAKE_SPEED = 0.5;
 
     // Colour sensor constants for red sample

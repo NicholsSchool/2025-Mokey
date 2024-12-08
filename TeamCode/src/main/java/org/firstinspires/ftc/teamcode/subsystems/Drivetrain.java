@@ -101,7 +101,7 @@ public class Drivetrain implements DrivetrainConstants {
      */
     public void drive(Vector driveInput, double turn, boolean lowGear) {
         boolean isManualTurning = Math.abs(turn) < TURN_DEADBAND;
-        double turnCalculated = isManualTurning ? turnProfile.calculate(turnToAngle()) : turnProfile.calculate(turn);
+        double turnCalculated = isManualTurning ? turnToAngle() : turnProfile.calculate(turn);
         if(isManualTurning){targetHeading = pose.angle;}
         driveInput = driveProfile.calculate(driveInput.clipMagnitude(
                 (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turnCalculated)));
@@ -120,12 +120,6 @@ public class Drivetrain implements DrivetrainConstants {
 
     public void setTargetHeading(double targetHeading) {
         this.targetHeading = targetHeading;
-    }
-
-    public void setFloat() {
-        leftDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        rightDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-        backDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
     }
 
 //    public int[] getMotorVelocities() {

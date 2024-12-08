@@ -23,8 +23,8 @@ public class Auto extends LinearOpMode{
 
     @Override
     public void runOpMode() {
-        Drivetrain drivetrain = new Drivetrain(hardwareMap, 0, 0, 0, false);
-        drivetrain.setFloat();
+        Drivetrain drivetrain = new Drivetrain(hardwareMap, 0, 0, Math.PI, false);
+        //drivetrain.setFloat();
         ElapsedTime time = new ElapsedTime();
         Elevator elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
 
@@ -54,18 +54,11 @@ public class Auto extends LinearOpMode{
             elevator.periodic();
         }
         time.reset();
-        elevator.setSetpoint(ElevatorConstants.WAYPOINT_READY);
-        while(time.time(TimeUnit.SECONDS) < 1.5){
-            elevator.periodic();
-        }
-        time.reset();
-        while(time.time(TimeUnit.SECONDS) < 3.0){
-            drivetrain.drive(new Vector(0.8,-0.5), 0, true);
-            drivetrain.update();
-        }
-        time.reset();
         elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
-        while(time.time(TimeUnit.SECONDS) < 2){
+        drivetrain.setTargetHeading(Math.PI / 2);
+        while(time.time(TimeUnit.SECONDS) < 3.0){
+            drivetrain.drive(new Vector(0.8,-0.5), 0.0, true);
+            drivetrain.update();
             elevator.periodic();
         }
     }

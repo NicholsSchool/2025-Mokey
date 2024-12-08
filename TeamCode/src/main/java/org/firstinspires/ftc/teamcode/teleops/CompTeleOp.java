@@ -16,8 +16,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 
 import java.util.Arrays;
 
-@TeleOp(name="Comp tele", group="Dev")
-public class DevTelemetry extends OpMode {
+@TeleOp(name="[COMP] TeleOp", group="Dev")
+public class CompTeleOp extends OpMode {
 
     Drivetrain drivetrain;
     Elevator elevator;
