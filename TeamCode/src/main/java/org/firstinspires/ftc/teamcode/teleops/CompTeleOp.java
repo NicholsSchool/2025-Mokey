@@ -16,7 +16,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 
 import java.util.Arrays;
 
-@TeleOp(name="Dev Telemetry", group="Dev")
+@TeleOp(name="Comp tele", group="Dev")
 public class DevTelemetry extends OpMode {
 
     Drivetrain drivetrain;
@@ -90,7 +90,7 @@ public class DevTelemetry extends OpMode {
         elevator.periodic();
 
         intake.setWristSetpoint(controller2.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
-        intake.slideSoftLimit(-controller2.rightStick.toVector().y);
+        intake.slideRawPower(-controller2.rightStick.toVector().y);
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
 
         intake.periodic();
