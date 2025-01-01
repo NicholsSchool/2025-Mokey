@@ -13,7 +13,7 @@ import java.util.Optional;
 /**
  * The Robot Pose (x, y, theta)
  */
-public class NewRobotPose {
+public class PoseEstimator {
     public Pose2D initialPose;
 
     public Pose2D robotPose;
@@ -22,13 +22,17 @@ public class NewRobotPose {
 
     public OpticalSensor otos;
 
+    public boolean useLL;
+
+    public boolean isUsingLL;
 
     /**
      * The Field-Relative Robot Pose.
      * @param hwMap OpMode Hardware Map passthrough for LL, OTOS, and Gyro initialization.
      * @param initialPose Pose2D for robot's initial field-relative position.
      */
-    public NewRobotPose(HardwareMap hwMap, Pose2D initialPose, boolean useLL) {
+    public PoseEstimator(HardwareMap hwMap, Pose2D initialPose, boolean useLL) {
+        this.useLL = useLL;
         Optional<Point> LLPose = null;
         if (useLL) {
             limelight = new LimelightComponent(hwMap);
@@ -63,8 +67,34 @@ public class NewRobotPose {
 
     public Pose2D getPose() { return robotPose; }
 
+    public boolean isUsingLL() { return isUsingLL; }
+
     public void update() {
         otos.update();
+
+        if (useLL) limelight.updateWithPose(robotPose.getHeading(AngleUnit.DEGREES));
+
+        Optional<Point> LLEstimate = limelight.getRobotPose();
+
+        isUsingLL = LLEstimate.isPresent();
+
+        LLEstimate.ifPresent(point -> robotPose = new Pose2D(
+                DistanceUnit.METER,
+                point.x,
+                point.y,
+                AngleUnit.DEGREES,
+                getFieldHeading(AngleUnit.DEGREES)));
+
+        if( !LLEstimate.isPresent() ) {
+            Vector transformedDeltas = transformFieldOriented(otos.getPosDeltas());
+            robotPose = new Pose2D(
+                    DistanceUnit.METER,
+                    robotPose.getX(DistanceUnit.METER) + transformedDeltas.x,
+                    robotPose.getY(DistanceUnit.METER) + transformedDeltas.y,
+                    AngleUnit.DEGREES,
+                    getFieldHeading(AngleUnit.DEGREES)
+            );
+        }
     }
 
     public double getInitialHeading(AngleUnit unit) {
@@ -89,7 +119,6 @@ public class NewRobotPose {
         return new Vector(
                 (Math.cos(getFieldHeading(AngleUnit.RADIANS)) * inputVector.x) - (Math.sin(getFieldHeading(AngleUnit.RADIANS)) * inputVector.y),
                 (Math.sin(getFieldHeading(AngleUnit.RADIANS)) * inputVector.x) + (Math.cos(getFieldHeading(AngleUnit.RADIANS)) * inputVector.y)
-                //TODO: make sure this math is correct, there may be sign errors.
         );
     }
 

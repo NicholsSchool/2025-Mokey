@@ -12,7 +12,8 @@ import org.firstinspires.ftc.teamcode.math_utils.Vector;
 public class OpticalSensor {
 
     private final SparkFunOTOS otos;
-    private SparkFunOTOS.Pose2D pos;
+    private SparkFunOTOS.Pose2D pos = new SparkFunOTOS.Pose2D();
+    private Vector lastPos;
 
     /**
      * Instantiates the Sparkfun OTOS Sensor
@@ -38,6 +39,7 @@ public class OpticalSensor {
      * Updates the sensor position data, run every loop when using getPosition or getHeading.
      */
     public void update() {
+        lastPos = new Vector(pos.x, pos.y);
         pos = otos.getPosition();
     }
 
@@ -47,6 +49,10 @@ public class OpticalSensor {
      */
     public Vector getPosition() {
         return new Vector(pos.x, pos.y);
+    }
+
+    public Vector getPosDeltas() {
+        return new Vector(pos.x - lastPos.x, pos.y - lastPos.y);
     }
 
     /**
