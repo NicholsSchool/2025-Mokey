@@ -8,6 +8,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.subsystems.components.LimelightComponent;
 import org.firstinspires.ftc.teamcode.subsystems.components.OpticalSensor;
 
+import java.util.Optional;
+
 /**
  * The Robot Pose (x, y, theta)
  */
@@ -27,19 +29,21 @@ public class NewRobotPose {
      * @param initialPose Pose2D for robot's initial field-relative position.
      */
     public NewRobotPose(HardwareMap hwMap, Pose2D initialPose, boolean useLL) {
+        Optional<Point> LLPose = null;
         if (useLL) {
             limelight = new LimelightComponent(hwMap);
             limelight.updateWithPose(initialPose.getHeading(AngleUnit.DEGREES));
+            LLPose = limelight.getRobotPose();
         }
 
         otos = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.DEGREES);
 
         //If the limelight can localize at startup, use that for the initial pose.
-        if (useLL && limelight.getRobotPose().isPresent()) {
+        if (useLL && LLPose.isPresent() ) {
             this.initialPose = new Pose2D(
                     DistanceUnit.METER,
-                    limelight.getRobotPose().get().x,
-                    limelight.getRobotPose().get().y,
+                    LLPose.get().x,
+                    LLPose.get().y,
                     AngleUnit.DEGREES,
                     initialPose.getHeading(AngleUnit.DEGREES)
             );
@@ -83,8 +87,8 @@ public class NewRobotPose {
      */
     private Vector transformFieldOriented(Vector inputVector) {
         return new Vector(
-                (Math.cos(Math.toRadians(getFieldHeading(AngleUnit.RADIANS))) * inputVector.x) + (Math.sin(Math.toRadians(getFieldHeading(AngleUnit.RADIANS))) * inputVector.y),
-                (Math.sin(Math.toRadians(getFieldHeading(AngleUnit.RADIANS))) * inputVector.x) + (Math.cos(Math.toRadians(getFieldHeading(AngleUnit.RADIANS))) * inputVector.y)
+                (Math.cos(getFieldHeading(AngleUnit.RADIANS)) * inputVector.x) - (Math.sin(getFieldHeading(AngleUnit.RADIANS)) * inputVector.y),
+                (Math.sin(getFieldHeading(AngleUnit.RADIANS)) * inputVector.x) + (Math.cos(getFieldHeading(AngleUnit.RADIANS)) * inputVector.y)
                 //TODO: make sure this math is correct, there may be sign errors.
         );
     }
@@ -96,12 +100,8 @@ public class NewRobotPose {
     public Pose2D debugTransform() {
         Vector otosPos = otos.getPosition();
         Vector transformedPos = transformFieldOriented(otosPos);
-        Vector offsetPos = new Vector(
-                initialPose.getX(DistanceUnit.METER) + transformedPos.x,
-                initialPose.getY(DistanceUnit.METER) + transformedPos.y
-        );
 
-        return new Pose2D(DistanceUnit.METER, initialPose.getY(DistanceUnit.METER) + transformedPos.x, initialPose.getY(DistanceUnit.METER) + transformedPos.y, AngleUnit.DEGREES, getFieldHeading(AngleUnit.DEGREES));
+        return new Pose2D(DistanceUnit.METER, initialPose.getX(DistanceUnit.METER) + transformedPos.x, initialPose.getY(DistanceUnit.METER) + transformedPos.y, AngleUnit.DEGREES, getFieldHeading(AngleUnit.DEGREES));
     }
 
 }

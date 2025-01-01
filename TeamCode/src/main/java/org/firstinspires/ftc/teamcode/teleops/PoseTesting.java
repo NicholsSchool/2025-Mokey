@@ -17,7 +17,7 @@ public class PoseTesting extends OpMode {
     @Override
     public void init() {
 
-        pose = new NewRobotPose(hardwareMap, new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.DEGREES, 0), false);
+        pose = new NewRobotPose(hardwareMap, new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.DEGREES, 270), false);
 
     }
 
