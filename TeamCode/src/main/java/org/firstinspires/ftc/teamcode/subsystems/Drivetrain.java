@@ -136,6 +136,11 @@ public class Drivetrain implements DrivetrainConstants {
 
     public void resetIMU() { od.resetHeading(); }
 
+    public void resetElevatorEncoder() {
+        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public int getElevatorPosition() {
         return rightDrive.getCurrentPosition();
     }

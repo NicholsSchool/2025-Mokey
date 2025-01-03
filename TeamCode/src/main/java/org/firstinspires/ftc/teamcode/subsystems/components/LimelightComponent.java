@@ -44,7 +44,7 @@ public class LimelightComponent {
     public Optional<Point> getRobotPose()
     {
         LLResult result = limelight3A.getLatestResult();
-        if( result == null || !result.isValid() || result.getBotposeAvgDist() > 2 || result.getStddevMt2()[0] > 1 || result.getStddevMt2()[1] > 1 ) // 2 meters max dist
+        if( result == null || !result.isValid() || result.getBotposeAvgDist() > 2 ) // 2 meters max dist
             return Optional.empty();
        return Optional.of(new Point(result.getBotpose_MT2().getPosition().x, result.getBotpose_MT2().getPosition().y));
     }

@@ -59,15 +59,14 @@ public class Intake implements IntakeConstants {
     }
 
     public void periodic() {
-//        if (Math.abs(getEncoderPosition() - intakeSetpoint) > 1000) {
-//            this.slideRawPower(-slidePid.calculate(getEncoderPosition(), intakeSetpoint));
-//        }
+        this.slideRawPower(-slidePid.calculate(getEncoderPosition(), intakeSetpoint));
 
-      intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
-      intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint - 75) );
+        intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
+        intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint - 75) );
     }
 
     public int getEncoderPosition() { return slide.getCurrentPosition(); }
+
     public double getEncoderVelocity() { return slide.getVelocity(); }
 
     public double[] getWristServoPositions() {
@@ -75,13 +74,18 @@ public class Intake implements IntakeConstants {
     }
     public void slideRawPower(double power){
         slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-        slide.setPower(power * SLIDE_SPEED);
+        slide.setPower(power);
     }
 
     public void slideSoftLimit(double power){
         if(!(power > 0 && intakeSlidePos() > INTAKE_LIMIT)){
             slideRawPower(power);
         }
+    }
+
+    public void resetSlideEncoder(){
+        slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void setIntakeSetpoint(double intakeSetpoint){

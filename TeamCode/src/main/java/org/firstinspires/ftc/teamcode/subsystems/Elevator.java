@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.qualcomm.hardware.digitalchickenlabs.OctoQuadBase;
-import com.qualcomm.robotcore.hardware.CRServoImplEx;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import android.util.Log;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 
@@ -28,7 +26,7 @@ public class Elevator implements ElevatorConstants {
      *
      * @param hardwareMap the hardware map
      */
-    public Elevator(HardwareMap hardwareMap, IntSupplier elevatorPosition ) {
+    public Elevator(HardwareMap hardwareMap, IntSupplier elevatorPosition) {
         leftSlideMotor = hardwareMap.get(DcMotorEx.class, "LeftClimberMotor");
         leftSlideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         leftSlideMotor.setDirection(DcMotorEx.Direction.REVERSE);

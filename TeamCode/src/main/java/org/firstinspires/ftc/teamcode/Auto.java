@@ -24,8 +24,8 @@ public class Auto extends LinearOpMode{
     @Override
     public void runOpMode() {
         Drivetrain drivetrain = new Drivetrain(hardwareMap, 0, 0, Math.PI, false);
-        //drivetrain.setFloat();
         ElapsedTime time = new ElapsedTime();
+        drivetrain.resetElevatorEncoder();
         Elevator elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
 
         waitForStart();
