@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
-import org.firstinspires.ftc.teamcode.math_utils.Angles;
-import org.firstinspires.ftc.teamcode.math_utils.LerpPathPlanning;
-import org.firstinspires.ftc.teamcode.math_utils.Point;
 import org.firstinspires.ftc.teamcode.math_utils.Vector;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
@@ -45,14 +41,14 @@ public class Auto extends LinearOpMode{
             drivetrain.drive(new Vector(0.0,0.0), 0, true);
         }
         drivetrain.setTargetHeading(drivetrain.getPose().angle);
-        elevator.setSetpoint(ElevatorConstants.WAYPOINT_READY);
+        elevator.setSetpoint(ElevatorConstants.SPECIMEN_READY);
         while(time.time(TimeUnit.SECONDS) < 5.0){
             drivetrain.drive(new Vector(0.0,0.7), drivetrain.turnToAngle(), true);
             elevator.periodic();
             drivetrain.update();
         }
         time.reset();
-        elevator.setSetpoint(ElevatorConstants.WAYPOINT_PULL);
+        elevator.setSetpoint(ElevatorConstants.SPECIMEN_PULL);
         while(time.time(TimeUnit.SECONDS) < 1.5){
             elevator.periodic();
         }

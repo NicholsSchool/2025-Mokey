@@ -33,7 +33,7 @@ public class PoseEstimator {
      */
     public PoseEstimator(HardwareMap hwMap, Pose2D initialPose, boolean useLL) {
         this.useLL = useLL;
-        Optional<Point> LLPose = null;
+        Optional<Point> LLPose = Optional.empty();
         if (useLL) {
             limelight = new LimelightComponent(hwMap);
             limelight.updateWithPose(initialPose.getHeading(AngleUnit.DEGREES));

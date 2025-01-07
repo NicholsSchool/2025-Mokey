@@ -43,11 +43,11 @@ public class PIDTuning extends OpMode {
 
         intake.setIntakeSetpoint(controller1.triangle.isPressed() ? IntakeConstants.WAYPOINT_EXTEND : IntakeConstants.WAYPOINT_RETRACT);
 
-        elevator.setSetpoint( controller1.x.isPressed() ? ElevatorConstants.WAYPOINT_READY : ElevatorConstants.WAYPOINT_PULL );
+        elevator.setSetpoint( controller1.x.isPressed() ? ElevatorConstants.SPECIMEN_READY : ElevatorConstants.SPECIMEN_PULL);
 
         telemetry.addData("intake desired", controller1.triangle.isPressed() ? IntakeConstants.WAYPOINT_EXTEND : IntakeConstants.WAYPOINT_RETRACT);
         telemetry.addData("intake real", intake.getEncoderPosition());
-        telemetry.addData("elevator desired", controller1.x.isPressed() ? ElevatorConstants.WAYPOINT_READY : ElevatorConstants.WAYPOINT_PULL );
+        telemetry.addData("elevator desired", controller1.x.isPressed() ? ElevatorConstants.SPECIMEN_READY : ElevatorConstants.SPECIMEN_PULL);
         telemetry.addData("elevator real", elevator.getEncoderPosition());
 
         //intake.periodic();

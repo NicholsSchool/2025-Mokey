@@ -38,6 +38,7 @@ public class CompTeleOp extends OpMode {
 
         drivetrain = new Drivetrain(hardwareMap, 0, 0, Math.PI, false);
         elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
+        drivetrain.resetElevatorEncoder();
         intake = new Intake(hardwareMap);
 
         dashboard = FtcDashboard.getInstance();
@@ -78,8 +79,12 @@ public class CompTeleOp extends OpMode {
             elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
         }
 
-        if (controller2.rightBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_READY);
-        if (controller2.rightBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_PULL);
+        if (controller2.rightBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.SPECIMEN_READY);
+        if (controller2.rightBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.SPECIMEN_PULL);
+
+        if (controller2.leftBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.CLIMB_READY);
+        if (controller2.leftBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.CLIMB_PULL);
+
 
 //        if (controller1.leftBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_CLIMB_READY);
 //        if (controller1.leftBumper.wasJustReleased()) {
@@ -89,11 +94,11 @@ public class CompTeleOp extends OpMode {
 
         elevator.periodic();
 
-        intake.setWristSetpoint(controller2.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
-        intake.slideRawPower(-controller2.rightStick.toVector().y);
-        intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
-
-        intake.periodic();
+//        intake.setWristSetpoint(controller2.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
+//        intake.slideRawPower(-controller2.rightStick.toVector().y);
+//        intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
+//
+//        intake.periodic();
 
         drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, false);
 

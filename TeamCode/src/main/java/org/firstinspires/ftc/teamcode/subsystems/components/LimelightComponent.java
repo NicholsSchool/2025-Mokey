@@ -38,7 +38,7 @@ public class LimelightComponent {
      * More accurately, returns the nearest LL result pose using MT2 detection, requiring an accurate robot yaw update.
      * Will return an empty optional if the LL is not on, connected, no AT's are in view, or the nearest AT is > 2m away.
      * 
-     * @return an Optional of the Point representing the estimated robot pose, in LL field coorinates. 
+     * @return an Optional of the Point representing the estimated robot pose, in LL field coordinates.
      *  Empty optional of no detected or the result is beyond 2m.
      */
     public Optional<Point> getRobotPose()
@@ -47,6 +47,12 @@ public class LimelightComponent {
         if( result == null || !result.isValid() || result.getBotposeAvgDist() > 2 ) // 2 meters max dist
             return Optional.empty();
        return Optional.of(new Point(result.getBotpose_MT2().getPosition().x, result.getBotpose_MT2().getPosition().y));
+    }
+
+    public Optional<Point> getRobotPose( double yaw )
+    {
+        this.updateWithPose(yaw);
+        return this.getRobotPose();
     }
 
 
