@@ -4,6 +4,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.constants.DrivetrainConstants;
 import org.firstinspires.ftc.teamcode.math_utils.Angles;
+import org.firstinspires.ftc.teamcode.math_utils.PoseEstimator;
 import org.firstinspires.ftc.teamcode.math_utils.VectorMotionProfile;
 import org.firstinspires.ftc.teamcode.math_utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.math_utils.Vector;
@@ -13,9 +14,10 @@ import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 import org.firstinspires.ftc.teamcode.subsystems.components.OpticalSensor;
 //import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
-import com.kauailabs.navx.ftc.AHRS;
-import com.qualcomm.hardware.digitalchickenlabs.OctoQuadBase;
-import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -26,32 +28,26 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Robot Drivetrain
  */
 public class Drivetrain implements DrivetrainConstants {
-    private final DcMotorEx leftDrive, rightDrive, backDrive;
-//    private final leftEncoder, rightEncoder, backEncoder;
-    public final IndicatorLight leftLight, rightLight;
-    private final VectorMotionProfile driveProfile;
-    private final MotionProfile turnProfile;
-    private final SimpleFeedbackController turnController;
-    private RobotPose pose;
-    private final boolean isBlueAlliance;
-    private double imuOffset, targetHeading;
+    private DcMotorEx leftDrive, rightDrive, backDrive;
+    public IndicatorLight leftLight, rightLight;
+    private VectorMotionProfile driveProfile;
+    private MotionProfile turnProfile;
+    private SimpleFeedbackController turnController;
+    private double headingOffset = Math.PI / 2;
+    public PoseEstimator poseEstimator;
+    private double targetHeading;
     private OpticalSensor od;
 
     /**
      * Initializes the Drivetrain subsystem
      *
      * @param hwMap the hardwareMap
-     * @param x the initial x coordinate
-     * @param y the initial y coordinate
-     * @param initialHeading the initial robot heading in radians
-     * @param isBlue whether we are blue alliance
+     * @param initialPose the initial Pose2D
      */
-    public Drivetrain(HardwareMap hwMap, double x, double y, double initialHeading, boolean isBlue) {
-        this.imuOffset = initialHeading + (isBlue ? Math.PI : 0);
-        this.targetHeading = initialHeading;
-        this.isBlueAlliance = isBlue;
+    public Drivetrain(HardwareMap hwMap, Pose2D initialPose) {
+        this.targetHeading = initialPose.getHeading(AngleUnit.RADIANS);
         od = new OpticalSensor("OTOS", hwMap, DistanceUnit.INCH, AngleUnit.RADIANS);
-        pose = new RobotPose(x, y, initialHeading);
+        poseEstimator = new PoseEstimator(hwMap, initialPose, true);
 
 
         leftDrive = hwMap.get(DcMotorEx.class, "LeftDriveMotor");
@@ -88,8 +84,7 @@ public class Drivetrain implements DrivetrainConstants {
     }
 
     public void update() {
-        od.update();
-        pose = new RobotPose(-od.getPosition().x, -od.getPosition().y, od.getHeading() + imuOffset );
+        poseEstimator.update();
     }
 
     /**
@@ -107,14 +102,15 @@ public class Drivetrain implements DrivetrainConstants {
                 (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turnCalculated)));
         double power = driveInput.magnitude();
         double angle = driveInput.angle();
-
-        leftDrive.setPower(turnCalculated + power * Math.cos(angle + LEFT_DRIVE_OFFSET - pose.angle));
-        rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - pose.angle));
-        backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - pose.angle));
+        //TODO add offset and intial heading
+        leftDrive.setPower(turnCalculated + power * Math.cos(angle + LEFT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS)));
+        rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS)));
+        backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS)));
     }
+
  
     public double turnToAngle() {
-        double error = Angles.clipRadians(pose.angle - targetHeading);
+        double error = Angles.clipRadians(poseEstimator.getPose().getHeading(AngleUnit.RADIANS) - targetHeading);
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error / 3;
     }
 
@@ -132,7 +128,7 @@ public class Drivetrain implements DrivetrainConstants {
         backDrive.setPower(power );
     }
 
-    public RobotPose getPose() { return pose; }
+    public Pose2D getPose() { return poseEstimator.getPose(); }
 
     public void resetIMU() { od.resetHeading(); }
 
