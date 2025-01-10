@@ -8,6 +8,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.controller.Controller;
 import org.firstinspires.ftc.teamcode.math_utils.PoseEstimator;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 
@@ -22,13 +23,15 @@ public class PoseTesting extends OpMode {
     private PoseEstimator poseEstimator;
     FtcDashboard dashboard;
     private Drivetrain drivetrain;
+    Controller driverOI;
 
     @Override
     public void init() {
 
+        Pose2D initialPose = new Pose2D(DistanceUnit.INCH, 0, 40, AngleUnit.DEGREES, 270);
+        drivetrain = new Drivetrain(hardwareMap, initialPose, 270, false);
         poseEstimator = drivetrain.poseEstimator;
-        Pose2D initialPose = new Pose2D(DistanceUnit.INCH, 0, 20, AngleUnit.DEGREES, 270);
-        drivetrain = new Drivetrain(hardwareMap, initialPose);
+        driverOI = new Controller(gamepad1);
         dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -39,6 +42,11 @@ public class PoseTesting extends OpMode {
     public void loop() {
 
         drivetrain.update();
+        driverOI.update();
+
+        drivetrain.drive(driverOI.leftStick.toVector(), driverOI.rightStick.x.value(), !driverOI.rightBumper.isPressed());
+
+        //drivetrain.driveToPose(new Pose2D(DistanceUnit.INCH, 40, 40, AngleUnit.DEGREES, 0), true);
 
         telemetry.addData("OTOS Heading", poseEstimator.otos.getHeading());
         telemetry.addData("OTOS Position", poseEstimator.otos.getPosition().toString());

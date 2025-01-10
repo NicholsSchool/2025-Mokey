@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystems;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.constants.DrivetrainConstants;
 import org.firstinspires.ftc.teamcode.math_utils.Angles;
 import org.firstinspires.ftc.teamcode.math_utils.PoseEstimator;
@@ -35,7 +36,7 @@ public class Drivetrain implements DrivetrainConstants {
     private SimpleFeedbackController turnController;
     private double headingOffset = Math.PI / 2;
     public PoseEstimator poseEstimator;
-    private double targetHeading;
+    private double targetHeading, fieldOrientedForward;
     private OpticalSensor od;
 
     /**
@@ -43,12 +44,13 @@ public class Drivetrain implements DrivetrainConstants {
      *
      * @param hwMap the hardwareMap
      * @param initialPose the initial Pose2D
+     * @param fieldOrientedForward the field direction that the robot drives when turn angle is 0 (in degrees)
      */
-    public Drivetrain(HardwareMap hwMap, Pose2D initialPose) {
+    public Drivetrain(HardwareMap hwMap, Pose2D initialPose, double fieldOrientedForward, boolean useLL) {
         this.targetHeading = initialPose.getHeading(AngleUnit.RADIANS);
+        this.fieldOrientedForward = Math.toRadians(fieldOrientedForward) - Math.PI / 2;
         od = new OpticalSensor("OTOS", hwMap, DistanceUnit.INCH, AngleUnit.RADIANS);
-        poseEstimator = new PoseEstimator(hwMap, initialPose, true);
-
+        poseEstimator = new PoseEstimator(hwMap, initialPose, useLL);
 
         leftDrive = hwMap.get(DcMotorEx.class, "LeftDriveMotor");
         rightDrive = hwMap.get(DcMotorEx.class, "RightDriveMotor");
@@ -102,16 +104,22 @@ public class Drivetrain implements DrivetrainConstants {
                 (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turnCalculated)));
         double power = driveInput.magnitude();
         double angle = driveInput.angle();
-        //TODO add offset and intial heading
-        leftDrive.setPower(turnCalculated + power * Math.cos(angle + LEFT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS)));
-        rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS)));
-        backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS)));
+        leftDrive.setPower(turnCalculated + power * Math.cos(angle + LEFT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
+        rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
+        backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
     }
-
  
     public double turnToAngle() {
         double error = Angles.clipRadians(poseEstimator.getPose().getHeading(AngleUnit.RADIANS) - targetHeading);
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error / 3;
+    }
+
+    public void driveToPose(Pose2D targetPose, boolean lowGear){
+        Vector driveInput = new Vector(targetPose.getX(DistanceUnit.INCH) - poseEstimator.getPose().getX(DistanceUnit.INCH),
+                targetPose.getY(DistanceUnit.INCH) - poseEstimator.getPose().getY(DistanceUnit.INCH));
+        setTargetHeading(targetPose.getHeading(AngleUnit.RADIANS));
+        driveInput.scaleMagnitude(-0.8);
+        drive(driveInput,turnToAngle(), lowGear);
     }
 
     public void setTargetHeading(double targetHeading) {

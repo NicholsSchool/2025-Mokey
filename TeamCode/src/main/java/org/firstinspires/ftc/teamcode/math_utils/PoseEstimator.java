@@ -72,9 +72,10 @@ public class PoseEstimator {
     public void update() {
         otos.update();
 
-        if (useLL) limelight.updateWithPose(robotPose.getHeading(AngleUnit.DEGREES));
+        if (useLL && robotPose != null) limelight.updateWithPose(robotPose.getHeading(AngleUnit.DEGREES));
 
-        Optional<Point> LLEstimate = limelight.getRobotPose();
+        Optional<Point> LLEstimate = Optional.empty();
+        if (useLL) LLEstimate = limelight.getRobotPose();
 
         isUsingLL = LLEstimate.isPresent();
 
@@ -117,8 +118,8 @@ public class PoseEstimator {
      */
     private Vector transformFieldOriented(Vector inputVector) {
         return new Vector(
-                (Math.cos(getFieldHeading(AngleUnit.RADIANS)) * inputVector.x) - (Math.sin(getFieldHeading(AngleUnit.RADIANS)) * inputVector.y),
-                (Math.sin(getFieldHeading(AngleUnit.RADIANS)) * inputVector.x) + (Math.cos(getFieldHeading(AngleUnit.RADIANS)) * inputVector.y)
+                (Math.cos(initialPose.getHeading(AngleUnit.RADIANS)) * inputVector.x) - (Math.sin(initialPose.getHeading(AngleUnit.RADIANS)) * inputVector.y),
+                (Math.sin(initialPose.getHeading(AngleUnit.RADIANS)) * inputVector.x) + (Math.cos(initialPose.getHeading(AngleUnit.RADIANS)) * inputVector.y)
         );
     }
 
