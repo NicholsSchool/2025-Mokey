@@ -28,12 +28,11 @@ public class PoseTesting extends OpMode {
     @Override
     public void init() {
 
-        Pose2D initialPose = new Pose2D(DistanceUnit.INCH, 0, 40, AngleUnit.DEGREES, 270);
-        drivetrain = new Drivetrain(hardwareMap, initialPose, 270, false);
+        Pose2D initialPose = new Pose2D(DistanceUnit.INCH, 0, 48, AngleUnit.DEGREES, 270);
+        drivetrain = new Drivetrain(hardwareMap, initialPose, 270, true);
         poseEstimator = drivetrain.poseEstimator;
         driverOI = new Controller(gamepad1);
         dashboard = FtcDashboard.getInstance();
-        Telemetry dashboardTelemetry = dashboard.getTelemetry();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.setMsTransmissionInterval(50);
     }
@@ -45,8 +44,6 @@ public class PoseTesting extends OpMode {
         driverOI.update();
 
         drivetrain.drive(driverOI.leftStick.toVector(), driverOI.rightStick.x.value(), !driverOI.rightBumper.isPressed());
-
-        //drivetrain.driveToPose(new Pose2D(DistanceUnit.INCH, 40, 40, AngleUnit.DEGREES, 0), true);
 
         telemetry.addData("OTOS Heading", poseEstimator.otos.getHeading());
         telemetry.addData("OTOS Position", poseEstimator.otos.getPosition().toString());
