@@ -23,7 +23,15 @@ public class Intake implements IntakeConstants {
     private final PIDController slidePid;
     private final PIDController wristFPid;
     private final PIDController wristBPid;
-    //public final ColorSensor colorSensor;
+
+    private INTAKE_STATE intakeState;
+
+    public enum INTAKE_STATE
+    {
+        MANUAL,
+        GO_TO_POS,
+        STOPPED
+    }
 
     public Intake(HardwareMap hwMap) {
         slide = hwMap.get(DcMotorEx.class, "IntakeMotor");
@@ -59,28 +67,38 @@ public class Intake implements IntakeConstants {
     }
 
     public void periodic() {
-        this.slideRawPower(-slidePid.calculate(getEncoderPosition(), intakeSetpoint));
+
+        switch  (intakeState) {
+            case MANUAL:
+                this.intakeSetpoint = this.getIntakeSlidePos();
+                break;
+            case GO_TO_POS:
+                slideRawPower(-slidePid.calculate(getIntakeSlidePos(), intakeSetpoint));
+                break;
+            case STOPPED:
+            default:
+                slideRawPower(0);
+        }
 
         intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
         intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint - 75) );
     }
 
-    public int getEncoderPosition() { return slide.getCurrentPosition(); }
+    public int getIntakeSlidePos() { return slide.getCurrentPosition(); }
 
     public double getEncoderVelocity() { return slide.getVelocity(); }
 
     public double[] getWristServoPositions() {
         return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0, wristBEncoder.getVoltage() / 3.3 * 360.0} ;
     }
-    public void slideRawPower(double power){
+    private void slideRawPower(double power){
         slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         slide.setPower(power);
     }
 
-    public void slideSoftLimit(double power){
-        if(!(power > 0 && intakeSlidePos() > INTAKE_LIMIT)){
-            slideRawPower(power);
-        }
+    public void manualControl(double power){
+       this.intakeState = INTAKE_STATE.MANUAL;
+       slideRawPower(power);
     }
 
     public void resetSlideEncoder(){
@@ -89,11 +107,16 @@ public class Intake implements IntakeConstants {
     }
 
     public void setIntakeSetpoint(double intakeSetpoint){
+        this.intakeState = INTAKE_STATE.GO_TO_POS;
         this.intakeSetpoint = intakeSetpoint;
     }
 
     public void setPIDCoefficients(double kP, double kI, double kD) {
         slidePid.setPID(kP, kI, kD);
+    }
+
+    public void setIntakeState(INTAKE_STATE state) {
+        this.intakeState = state;
     }
 
     public void runIntake(double power){
@@ -116,10 +139,6 @@ public class Intake implements IntakeConstants {
     public enum WristState {
         IN,
         OUT
-    }
-
-    public int intakeSlidePos(){
-        return slide.getCurrentPosition();
     }
 
 }

@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
+import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
 import org.firstinspires.ftc.teamcode.controller.Controller;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Elevator;
@@ -27,11 +28,6 @@ public class CompTeleOp extends OpMode {
     Intake intake;
 
     FtcDashboard dashboard;
-
-    boolean showDrivetrainTelem = false;
-    boolean showElevatorTelem = false;
-    boolean showIntakeTelem = false;
-    boolean showOtherTelem = false;
 
     Controller controller1;
     Controller controller2;
@@ -63,13 +59,6 @@ public class CompTeleOp extends OpMode {
         drivetrain.leftLight.setColour(IndicatorLight.Colour.ORANGE);
         drivetrain.rightLight.setColour(IndicatorLight.Colour.ORANGE);
 
-        telemetry.addLine(
-                "Circle for Drivetrain, Triangle for Elevator, Square for Intake, X for Other"
-        );
-        telemetry.addData("Showing: ", (showDrivetrainTelem ? "Drivetrain" : "") +
-                (showElevatorTelem ? " Elevator" : "") + (showIntakeTelem ? " Intake" : "") +
-                (showOtherTelem ? " Other" : ""));
-
         if (controller1.options.wasJustPressed()) drivetrain.resetIMU();
 
         if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
@@ -77,6 +66,9 @@ public class CompTeleOp extends OpMode {
         if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
         if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
 
+        if( Math.abs(controller2.leftStick.y.value()) > 0.05 )
+            elevator.manualControl( -controller2.leftStick.y.value() );
+        else elevator.setState(Elevator.ELEVATOR_STATE.GO_TO_POS);
 
         if (controller2.x.wasJustPressed()) {
             elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
@@ -91,20 +83,32 @@ public class CompTeleOp extends OpMode {
 
         elevator.periodic();
 
-//        intake.setWristSetpoint(controller2.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
-//        intake.slideRawPower(-controller2.rightStick.toVector().y);
-//        intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
-//
-//        intake.periodic();
+        if ( Math.abs(controller2.rightStick.y.value()) > 0.05 ) {
+            intake.manualControl(-controller2.rightStick.toVector().y);
+        } else {
+            intake.setIntakeState(Intake.INTAKE_STATE.GO_TO_POS);
+        }
+
+        if( controller2.dpadDown.wasJustPressed() )
+            intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_EXTEND);
+        if( controller2.dpadUp.wasJustPressed())
+            intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_RETRACT);
+
+        intake.setWristSetpoint(controller2.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
+        intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
+
+        intake.periodic();
 
         drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, false);
 
             telemetry.addData("Robot Pose", drivetrain.getPose().toString());
-            telemetry.addData("yaw", drivetrain.getPose().getHeading(AngleUnit.DEGREES));
+
             telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
             telemetry.addData("Elevator Encoder Position", elevator.getEncoderPosition());
+            telemetry.addData("Elevator State", elevator.getState().toString());
+
+            telemetry.addData("Intake Position", intake.getIntakeSlidePos());
 
             telemetry.addData("Wrist Servo Positions", Arrays.toString(intake.getWristServoPositions()));
-            telemetry.addData("slide Pos", intake.intakeSlidePos());
     }
 }

@@ -20,6 +20,14 @@ public class Elevator implements ElevatorConstants {
     private final IntSupplier elevatorPosition;
     public final PIDController pidController;
     private double setpoint;
+    private ELEVATOR_STATE state;
+
+    public enum ELEVATOR_STATE
+    {
+        MANUAL,
+        GO_TO_POS,
+        STOPPED
+    }
 
     /**
      * Initializes the Arm
@@ -39,25 +47,59 @@ public class Elevator implements ElevatorConstants {
         setpoint = 0.0;
         pidController = new PIDController(SLIDE_P, 0.0, 0.0);
         this.elevatorPosition = elevatorPosition;
+        this.state = ELEVATOR_STATE.GO_TO_POS;
     }
 
     public void periodic() {
-        slideRawPower( -pidController.calculate( this.getEncoderPosition(), setpoint ));
+        switch( state )
+        {
+            case MANUAL:
+                this.setpoint = this.getEncoderPosition();
+                break;
+            case GO_TO_POS:
+                slideRawPower(-pidController.calculate(this.getEncoderPosition(), this.setpoint));
+                break;
+            case STOPPED:
+            default:
+                slideRawPower(0);
+        }
     }
 
     public int getEncoderPosition() { return elevatorPosition.getAsInt(); }
 
 
     public void setSetpoint(double setpoint) {
+        this.state = ELEVATOR_STATE.GO_TO_POS;
         this.setpoint = setpoint;
+    }
+
+    public void manualControl(double power)
+    {
+        this.state = ELEVATOR_STATE.MANUAL;
+        slideRawPower(power);
     }
 
     public void setPIDCoefficients(double kP, double kI, double kD) {
         pidController.setPID(kP, kI, kD);
     }
 
-    public void slideRawPower(double power){
+    private void slideRawPower(double power){
         leftSlideMotor.setPower(power);
         rightSlideMotor.setPower(power);
+    }
+
+    public void stopElevator()
+    {
+        state = ELEVATOR_STATE.STOPPED;
+    }
+
+    public ELEVATOR_STATE getState()
+    {
+        return state;
+    }
+
+    public void setState(ELEVATOR_STATE state)
+    {
+        this.state = state;
     }
 }

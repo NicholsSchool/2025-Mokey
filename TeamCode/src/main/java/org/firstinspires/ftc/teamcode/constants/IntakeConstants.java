@@ -4,7 +4,6 @@ public interface IntakeConstants {
     double SLIDE_P = 0.0001;
 
     double WAYPOINT_RETRACT = 0;
-    //double WAYPOINT_EXTEND = -24000;
     double WAYPOINT_EXTEND = -10000;
 
     double INTAKE_SPEED = 0.5;

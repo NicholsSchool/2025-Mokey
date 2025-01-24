@@ -147,6 +147,6 @@ public class Drivetrain implements DrivetrainConstants {
     }
 
     public int getElevatorPosition() {
-        return rightDrive.getCurrentPosition();
+        return backDrive.getCurrentPosition();
     }
 }
