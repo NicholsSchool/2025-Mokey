@@ -58,12 +58,11 @@ public class Intake implements IntakeConstants {
         wristSetpoint = INTAKE_WRIST_FRONT_IN;
         wristFPid = new PIDController( 0.005, 0.0, 0.0 );
         wristBPid = new PIDController( 0.005, 0.0,0.0);
-// 88,220
-//186, 318
+
         intakeSetpoint = 0.0;
         slidePid = new PIDController(SLIDE_P, 0.0, 0.0 );
 
-        //colorSensor = hwMap.get(ColorSensor.class, "IntakeColor");
+        intakeState = INTAKE_STATE.STOPPED;
     }
 
     public void periodic() {
@@ -92,7 +91,7 @@ public class Intake implements IntakeConstants {
         return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0, wristBEncoder.getVoltage() / 3.3 * 360.0} ;
     }
     private void slideRawPower(double power){
-        slide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        slide.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         slide.setPower(power);
     }
 

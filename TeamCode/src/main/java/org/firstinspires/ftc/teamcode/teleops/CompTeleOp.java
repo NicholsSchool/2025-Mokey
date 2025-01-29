@@ -51,8 +51,8 @@ public class CompTeleOp extends OpMode {
         controller2.update();
         drivetrain.update();
 
-        drivetrain.leftLight.setColour(IndicatorLight.Colour.ORANGE);
-        drivetrain.rightLight.setColour(IndicatorLight.Colour.ORANGE);
+        //drivetrain.leftLight.setColour(IndicatorLight.Colour.ORANGE);
+        //drivetrain.rightLight.setColour(IndicatorLight.Colour.ORANGE);
 
         if (controller1.options.wasJustPressed()) drivetrain.resetIMU();
 

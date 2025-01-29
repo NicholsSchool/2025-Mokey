@@ -5,9 +5,16 @@ package org.firstinspires.ftc.teamcode.constants;
  */
 public interface DrivetrainConstants {
 
-    int LEFT_DRIVE_ENC = 2;
-    int RIGHT_DRIVE_ENC = 4;
-    int BACK_DRIVE_ENC = 3;
+    /* The threshold at which to stop driving in driveToPose */
+    double DRIVE_SETPOINT_THRESHOLD = 1.0;
+
+    /* The threshold at which to stop auto-aligning in driveToPose */
+    double TURN_SETPOINT_THRESHOLD = 3.0;
+
+    double DRIVE_TO_POS_PROPORTIONAL = 0.1;
+
+    double DRIVE_TO_POS_FEEDFORWARD = 0.05;
+
     /** The Maximum Speed of the Driving Profile */
     double DRIVE_PROFILE_SPEED = 10.0;
 

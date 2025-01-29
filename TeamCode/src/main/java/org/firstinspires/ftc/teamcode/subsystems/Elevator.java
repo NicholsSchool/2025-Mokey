@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
+import org.firstinspires.ftc.teamcode.math_utils.AutoUtil;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 
 import java.util.function.DoubleSupplier;
@@ -68,9 +69,12 @@ public class Elevator implements ElevatorConstants {
     public int getEncoderPosition() { return elevatorPosition.getAsInt(); }
 
 
-    public void setSetpoint(double setpoint) {
+    public AutoUtil.AutoActionState setSetpoint(double setpoint) {
         this.state = ELEVATOR_STATE.GO_TO_POS;
         this.setpoint = setpoint;
+        if (Math.abs(setpoint - this.getEncoderPosition()) < 500) {
+            return AutoUtil.AutoActionState.FINISHED;
+        } else { return AutoUtil.AutoActionState.RUNNING; }
     }
 
     public void manualControl(double power)

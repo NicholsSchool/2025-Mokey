@@ -5,6 +5,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.constants.DrivetrainConstants;
 import org.firstinspires.ftc.teamcode.math_utils.Angles;
+import org.firstinspires.ftc.teamcode.math_utils.AutoUtil;
 import org.firstinspires.ftc.teamcode.math_utils.PoseEstimator;
 import org.firstinspires.ftc.teamcode.math_utils.VectorMotionProfile;
 import org.firstinspires.ftc.teamcode.math_utils.MotionProfile;
@@ -31,7 +32,7 @@ import java.util.function.BooleanSupplier;
  */
 public class Drivetrain implements DrivetrainConstants {
     private DcMotorEx leftDrive, rightDrive, backDrive;
-    public IndicatorLight leftLight, rightLight;
+    //public IndicatorLight leftLight, rightLight;
     private VectorMotionProfile driveProfile;
     private MotionProfile turnProfile;
     private SimpleFeedbackController turnController;
@@ -78,8 +79,8 @@ public class Drivetrain implements DrivetrainConstants {
 //        rightEncoder = new OctoEncoder(hwMap, RIGHT_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
 //        backEncoder = new OctoEncoder(hwMap, BACK_DRIVE_ENC, OctoQuadBase.EncoderDirection.FORWARD);
 
-        leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.GREEN);
-        rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.GREEN);
+//        leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.GREEN);
+//        rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.GREEN);
 
         driveProfile = new VectorMotionProfile(DRIVE_PROFILE_SPEED);
         turnProfile = new MotionProfile(TURN_PROFILE_SPEED, TURN_PROFILE_MAX);
@@ -115,21 +116,29 @@ public class Drivetrain implements DrivetrainConstants {
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error / 3;
     }
 
-    public void driveToPose(Pose2D targetPose, boolean lowGear){
+    public AutoUtil.AutoActionState driveToPose(Pose2D targetPose, boolean lowGear){
         Vector driveInput = new Vector(targetPose.getX(DistanceUnit.INCH) - poseEstimator.getPose().getX(DistanceUnit.INCH),
                 targetPose.getY(DistanceUnit.INCH) - poseEstimator.getPose().getY(DistanceUnit.INCH));
+
+        if ( driveInput.magnitude() < DRIVE_SETPOINT_THRESHOLD &&
+                Math.abs( this.getPose().getHeading(AngleUnit.DEGREES) - targetPose.getHeading(AngleUnit.DEGREES) ) > TURN_SETPOINT_THRESHOLD ) {
+            return AutoUtil.AutoActionState.FINISHED;
+        }
+
         setTargetHeading(targetPose.getHeading(AngleUnit.RADIANS));
-        driveInput.scaleMagnitude(-0.8);
+
+        if( driveInput.magnitude() < DRIVE_SETPOINT_THRESHOLD )
+            return AutoUtil.AutoActionState.RUNNING;
+
+        driveInput.scaleMagnitude(-DRIVE_TO_POS_PROPORTIONAL * driveInput.magnitude() - DRIVE_TO_POS_FEEDFORWARD);
         drive(driveInput,turnToAngle(), lowGear);
+
+        return AutoUtil.AutoActionState.RUNNING;
     }
 
     public void setTargetHeading(double targetHeading) {
         this.targetHeading = targetHeading;
     }
-
-//    public int[] getMotorVelocities() {
-//        return new int[]{leftEncoder.getVelocity(), rightEncoder.getVelocity(), backEncoder.getVelocity()};
-//    }
 
     public void runDriveMotors(double power){
         leftDrive.setPower(power);
