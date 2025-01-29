@@ -11,9 +11,7 @@ public interface DrivetrainConstants {
     /* The threshold at which to stop auto-aligning in driveToPose */
     double TURN_SETPOINT_THRESHOLD = 3.0;
 
-    double DRIVE_TO_POS_PROPORTIONAL = 0.1;
-
-    double DRIVE_TO_POS_FEEDFORWARD = 0.05;
+    double DRIVE_TO_POS_PROPORTIONAL = 0.25;
 
     /** The Maximum Speed of the Driving Profile */
     double DRIVE_PROFILE_SPEED = 10.0;
@@ -25,7 +23,7 @@ public interface DrivetrainConstants {
     double TURN_PROFILE_MAX = 0.5;
 
     /** Virtual Low Gear Max Speed */
-    double VIRTUAL_LOW_GEAR = 0.775;
+    double VIRTUAL_LOW_GEAR = 0.75;
 
     /** Virtual High Gear Max Speed */
     double VIRTUAL_HIGH_GEAR = 1;
@@ -50,26 +48,4 @@ public interface DrivetrainConstants {
 
     /** Drive Motor Integral Gain */
     double DRIVE_I = 6.0;
-
-    /** The Maximum Ticks per second velocity of 20:1 Hex Motors */
-    double MAX_MOTOR_VELOCITY = 2800.0;
-
-    /** Thru Bore Encoder ticks per revolution */
-    int THRU_BORE_TICKS_PER_REV = 8192;
-
-    /** Dead wheel diameter in inches */
-    double DEAD_WHEEL_DIAMETER = 2.5;
-
-    /** Inches per tick of a dead wheel */
-    double INCHES_PER_TICK = DEAD_WHEEL_DIAMETER * Math.PI / THRU_BORE_TICKS_PER_REV;
-
-    /** Horizontal Correction coefficient */
-    double STRAFE_ODOMETRY_CORRECTION = 0.553336722097;
-
-    /** Forward Correction coefficient */
-    double FORWARD_ODOMETRY_CORRECTION = 0.942379475317;
-    /** value the turning needs to be greater than to cancel autoAlign*/
-    double TURN_DEADBAND = 0.05;
-    /** value turn is multiplied by to get the actual turn value*/
-    double TURN_MULTIPLIER = 0.3;
 }
