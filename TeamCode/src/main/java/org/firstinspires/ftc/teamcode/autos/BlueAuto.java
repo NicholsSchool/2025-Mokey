@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.autos;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -21,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 @Autonomous(name = "Blue Auto", group = "Auto")
 public class BlueAuto extends LinearOpMode {
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
         Drivetrain drivetrain = new Drivetrain(
                 hardwareMap,
@@ -37,6 +39,10 @@ public class BlueAuto extends LinearOpMode {
 
         drivetrain.resetElevatorEncoder();
 
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        telemetry.setMsTransmissionInterval(50);
+
         waitForStart();
 
         List<Callable<AutoUtil.AutoActionState>> actionSet = new ArrayList<>();
@@ -49,8 +55,9 @@ public class BlueAuto extends LinearOpMode {
         methodSet1.add(intake::periodic);
         methodSet1.add(() -> telemetry.addData("POSE", drivetrain.getPose().toString()));
         methodSet1.add(() -> telemetry.addData("ELEVATOR", drivetrain.getElevatorPosition()));
+        methodSet1.add(() -> drivetrain.sendDashboardPacket(dashboard));
         methodSet1.add(() -> telemetry.addLine(AutoUtil.getLoopStatesReadout()));
-        methodSet1.add(telemetry::update);
+        methodSet1.add(() -> telemetry.update());
 
         //Drive to chamber and set elevator to ready position
         actionSet.add( () -> drivetrain.driveToPose(new Pose2D(DistanceUnit.METER, -.06, 0.80, AngleUnit.RADIANS, 0), true) );
@@ -80,32 +87,32 @@ public class BlueAuto extends LinearOpMode {
 
         //Get behind the blocks
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -.85, .3, AngleUnit.DEGREES, 270 ), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -.85, .2, AngleUnit.DEGREES, 270 ), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
 
         //Strafe to behind block 1
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.15, .35, AngleUnit.DEGREES, 270), true ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.15, .2, AngleUnit.DEGREES, 270), true ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
 
         //Push block 1 to observation
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.25, 1.35, AngleUnit.DEGREES, 270), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.25, 1.2, AngleUnit.DEGREES, 270), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 
         // Return to behind blocks
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.15, .35, AngleUnit.DEGREES, 270), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.15, .2, AngleUnit.DEGREES, 270), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 
         //Strafe to block 2
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.40, .35, AngleUnit.DEGREES, 270), true ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.40, .2, AngleUnit.DEGREES, 270), true ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, .6 );
 
         //Push block 2 to observation
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.25, 1.35, AngleUnit.DEGREES, 270), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -1.25, 1.2, AngleUnit.DEGREES, 270), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 
         //Wait for HP
@@ -115,8 +122,8 @@ public class BlueAuto extends LinearOpMode {
 
         //Get ready for wall pick 1
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -0.94, 1.4, AngleUnit.DEGREES, 0), false ) );
-        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -0.94, 1.4, AngleUnit.DEGREES, 0), true ) );
+        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 for (int i = 0; i < 4; i++) {
         //Slam into wall for pick 1
         timedActionSet.add(() -> drivetrain.drive(new Vector(0.0, -0.7), 0.0, false));
@@ -140,9 +147,14 @@ for (int i = 0; i < 4; i++) {
         actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.SPECIMEN_PULL ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
 
-        //Get ready for wall pick 2 and bring down elevator
+        //Bring down elevator and go to HP
         actionSet.clear();
         actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO));
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -0.92, 1.1, AngleUnit.DEGREES, 0), false ) );
+        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
+
+        //Get ready for wall pick
+        actionSet.clear();
         actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -0.94, 1.4, AngleUnit.DEGREES, 0), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         }

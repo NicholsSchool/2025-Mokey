@@ -14,8 +14,9 @@ import org.firstinspires.ftc.teamcode.math_utils.SimpleFeedbackController;
 import org.firstinspires.ftc.teamcode.subsystems.components.OpticalSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.inspection.QrExclude;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -37,6 +38,7 @@ public class Drivetrain implements DrivetrainConstants {
      * @param hwMap the hardwareMap
      * @param initialPose the initial Pose2D
      * @param fieldOrientedForward the field direction that the robot drives when turn angle is 0 (in degrees)
+     *                             !IMPORTANT! For autos, this should be 270.
      */
     public Drivetrain(HardwareMap hwMap, Pose2D initialPose, double fieldOrientedForward, boolean useLL) {
         this.targetHeading = initialPose.getHeading(AngleUnit.RADIANS);
@@ -93,7 +95,17 @@ public class Drivetrain implements DrivetrainConstants {
         rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
         backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
     }
- 
+
+    public void autoDrive(Vector driveInput, double turn, boolean lowGear) {
+        double turnCalculated = turnProfile.calculate(turn);
+        driveInput.clipMagnitude((lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR) - Math.abs(turnCalculated));
+        double power = driveInput.magnitude();
+        double angle = driveInput.angle();
+        leftDrive.setPower(turnCalculated + power * Math.cos(angle + LEFT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
+        rightDrive.setPower(turnCalculated + power * Math.cos(angle + RIGHT_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
+        backDrive.setPower(turnCalculated + power * Math.cos(angle + BACK_DRIVE_OFFSET - poseEstimator.getPose().getHeading(AngleUnit.RADIANS) + fieldOrientedForward));
+    }
+
     public double turnToAngle() {
         double error = Angles.clipRadians(poseEstimator.getPose().getHeading(AngleUnit.RADIANS) - targetHeading);
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error / 3;
@@ -113,11 +125,8 @@ public class Drivetrain implements DrivetrainConstants {
         if( driveInput.magnitude() < DRIVE_SETPOINT_THRESHOLD )
             return AutoUtil.AutoActionState.RUNNING;
 
-        driveInput.scaleMagnitude(
-                -(DRIVE_TO_POS_PROPORTIONAL * Math.log(10 * driveInput.magnitude() + 1))
-                            / (driveInput.magnitude() * (lowGear ? VIRTUAL_LOW_GEAR : VIRTUAL_HIGH_GEAR)));
-        //decel on approach following p*ln(10x+1) and corrected for lowgear
-        drive(driveInput,turnToAngle(), lowGear);
+        driveInput.scaleMagnitude(-DRIVE_PROPORTIONAL * Math.pow(driveInput.magnitude(), 2));
+        autoDrive(driveInput,turnToAngle(), lowGear);
 
         return AutoUtil.AutoActionState.RUNNING;
     }
@@ -130,6 +139,27 @@ public class Drivetrain implements DrivetrainConstants {
         leftDrive.setPower(power);
         rightDrive.setPower(power);
         backDrive.setPower(power );
+    }
+
+    public void sendDashboardPacket(FtcDashboard dashboard) {
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.fieldOverlay()
+                .setAlpha(0.7)
+                .setStrokeWidth(1)
+                .setStroke("Red")
+                .strokeCircle(
+                        poseEstimator.getPose().getX(DistanceUnit.INCH),
+                        poseEstimator.getPose().getY(DistanceUnit.INCH),
+                        9
+                )
+                .setStroke("Green")
+                .strokeLine(
+                        poseEstimator.getPose().getX(DistanceUnit.INCH),
+                        poseEstimator.getPose().getY(DistanceUnit.INCH),
+                        poseEstimator.getPose().getX(DistanceUnit.INCH) + (9 * Math.cos(poseEstimator.getPose().getHeading(AngleUnit.RADIANS))),
+                        poseEstimator.getPose().getY(DistanceUnit.INCH) + (9 * Math.sin(poseEstimator.getPose().getHeading(AngleUnit.RADIANS)))
+                );
+        dashboard.sendTelemetryPacket(packet);
     }
 
     public Pose2D getPose() { return poseEstimator.getPose(); }
