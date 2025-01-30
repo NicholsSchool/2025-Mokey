@@ -54,7 +54,7 @@ public class CompTeleOp extends OpMode {
         //drivetrain.leftLight.setColour(IndicatorLight.Colour.ORANGE);
         //drivetrain.rightLight.setColour(IndicatorLight.Colour.ORANGE);
 
-        if (controller1.options.wasJustPressed()) drivetrain.resetIMU();
+        if (controller1.share.wasJustPressed()) drivetrain.resetIMU();
 
         //AUTO ALIGN
         if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
@@ -86,13 +86,13 @@ public class CompTeleOp extends OpMode {
         }
 
         //INTAKE SETPOINTS
-        if( controller2.dpadDown.wasJustPressed() )
+        if( controller2.dpadUp.wasJustPressed() )
             intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_EXTEND);
-        if( controller2.dpadUp.wasJustPressed())
+        if( controller2.dpadDown.wasJustPressed())
             intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_RETRACT);
 
         //WRIST SETPOINTS
-        intake.setWristSetpoint(controller2.leftBumper.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
+        intake.setWristSetpoint(controller2.triangle.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
 
         //INTAKE WHEEL
         intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
