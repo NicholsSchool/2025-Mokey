@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.constants;
 
 public interface IntakeConstants {
-    double SLIDE_P = 1E-5;
+    double SLIDE_P = 1E-3;
 
     double WAYPOINT_RETRACT = 0;
     double WAYPOINT_EXTEND = -10000;

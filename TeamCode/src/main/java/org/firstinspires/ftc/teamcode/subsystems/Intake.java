@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
@@ -15,7 +17,7 @@ public class Intake implements IntakeConstants {
     private final DcMotorEx slide;
 //    private final OctoEncoder slideEncoder;
     private final CRServoImplEx intakeWristF, intakeWristB;
-    private final CRServoImplEx intakeOne,intakeTwo;
+    private final CRServoImplEx intakeCR;
     private final AnalogInput wristFEncoder, wristBEncoder;
 
     private double intakeSetpoint;
@@ -23,6 +25,7 @@ public class Intake implements IntakeConstants {
     private final PIDController slidePid;
     private final PIDController wristFPid;
     private final PIDController wristBPid;
+    private final DigitalChannelImpl intakeZero;
 
     private INTAKE_STATE intakeState;
 
@@ -40,17 +43,19 @@ public class Intake implements IntakeConstants {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        intakeOne = hwMap.get(CRServoImplEx.class, "IntakeLeft");
-        intakeTwo = hwMap.get(CRServoImplEx.class, "IntakeRight");
+        intakeCR = hwMap.get(CRServoImplEx.class, "IntakeRight");
+        //intakeTwo = hwMap.get(CRServoImplEx.class, "IntakeRight");
 
-        intakeOne.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeTwo.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeCR.setDirection(DcMotorSimple.Direction.FORWARD);
+       // intakeTwo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intakeWristF = hwMap.get(CRServoImplEx.class, "WristFront");
         intakeWristB = hwMap.get(CRServoImplEx.class, "WristBack");
 
         intakeWristF.setDirection(DcMotorSimple.Direction.FORWARD);
         intakeWristB.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        intakeZero = hwMap.get(DigitalChannelImpl.class, "IntakeMagnet");
 
         wristFEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
         wristBEncoder = hwMap.get(AnalogInput.class, "WristBackEncoder");
@@ -78,6 +83,9 @@ public class Intake implements IntakeConstants {
             default:
                 slideRawPower(0);
         }
+
+        if( intakeZero.getState() ) this.resetSlideEncoder();
+
 
         intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
         intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint - 75) );
@@ -119,8 +127,8 @@ public class Intake implements IntakeConstants {
     }
 
     public void runIntake(double power){
-        intakeOne.setPower(power * INTAKE_SPEED);
-        intakeTwo.setPower(power * INTAKE_SPEED);
+        intakeCR.setPower(power);
+        //intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
     public void setWristSetpoint(WristState wristState){

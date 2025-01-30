@@ -26,6 +26,7 @@ public class CompTeleOp extends OpMode {
     Drivetrain drivetrain;
     Elevator elevator;
     Intake intake;
+    FtcDashboard dashboard;
 
     Controller controller1;
     Controller controller2;
@@ -38,6 +39,8 @@ public class CompTeleOp extends OpMode {
         drivetrain.resetElevatorEncoder();
         intake = new Intake(hardwareMap);
 
+        dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.setMsTransmissionInterval(50);
 
         controller1 = new Controller(gamepad1);
@@ -51,8 +54,8 @@ public class CompTeleOp extends OpMode {
         controller2.update();
         drivetrain.update();
 
-        //drivetrain.leftLight.setColour(IndicatorLight.Colour.ORANGE);
-        //drivetrain.rightLight.setColour(IndicatorLight.Colour.ORANGE);
+        drivetrain.leftLight.setColour(IndicatorLight.Colour.YELLOW);
+        drivetrain.rightLight.setColour(IndicatorLight.Colour.YELLOW);
 
         if (controller1.share.wasJustPressed()) drivetrain.resetIMU();
 
@@ -102,6 +105,7 @@ public class CompTeleOp extends OpMode {
         drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, false);
 
         telemetry.addData("Robot Pose", drivetrain.getPose().toString());
+        drivetrain.sendDashboardPacket(dashboard);
         telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
         telemetry.addData("Elevator Position", elevator.getEncoderPosition());
         telemetry.addData("Intake Desired Position", elevator.pidController.getSetpoint());

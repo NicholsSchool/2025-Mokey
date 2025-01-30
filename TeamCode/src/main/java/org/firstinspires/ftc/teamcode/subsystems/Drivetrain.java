@@ -5,12 +5,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.constants.DrivetrainConstants;
 import org.firstinspires.ftc.teamcode.math_utils.Angles;
 import org.firstinspires.ftc.teamcode.math_utils.AutoUtil;
+import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 import org.firstinspires.ftc.teamcode.math_utils.PoseEstimator;
 import org.firstinspires.ftc.teamcode.math_utils.VectorMotionProfile;
 import org.firstinspires.ftc.teamcode.math_utils.MotionProfile;
 import org.firstinspires.ftc.teamcode.math_utils.Vector;
 import org.firstinspires.ftc.teamcode.math_utils.SimpleFeedbackController;
 //import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
+import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 import org.firstinspires.ftc.teamcode.subsystems.components.OpticalSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -23,7 +25,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Drivetrain implements DrivetrainConstants {
     private final DcMotorEx leftDrive, rightDrive, backDrive;
-    //public IndicatorLight leftLight, rightLight;
+    public IndicatorLight leftLight, rightLight;
     private final VectorMotionProfile driveProfile;
     private final MotionProfile turnProfile;
     private final SimpleFeedbackController turnController;
@@ -31,6 +33,7 @@ public class Drivetrain implements DrivetrainConstants {
     private double targetHeading;
     private final double fieldOrientedForward;
     private final OpticalSensor od;
+    private final PIDController pidControllerX, pidControllerY;
 
     /**
      * Initializes the Drivetrain subsystem
@@ -66,8 +69,11 @@ public class Drivetrain implements DrivetrainConstants {
         rightDrive.setVelocityPIDFCoefficients(DRIVE_P, DRIVE_I, 0.0, 0.0);
         backDrive.setVelocityPIDFCoefficients(DRIVE_P, DRIVE_I, 0.0, 0.0);
 
-//        leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.GREEN);
-//        rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.GREEN);
+        pidControllerX = new PIDController( GO_TO_POS_P, 0.0, GO_TO_POS_D);
+        pidControllerY = new PIDController( GO_TO_POS_P, 0.0, GO_TO_POS_D );
+
+        leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.GREEN);
+        rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.GREEN);
 
         driveProfile = new VectorMotionProfile(DRIVE_PROFILE_SPEED);
         turnProfile = new MotionProfile(TURN_PROFILE_SPEED, TURN_PROFILE_MAX);
@@ -122,14 +128,23 @@ public class Drivetrain implements DrivetrainConstants {
 
         setTargetHeading(targetPose.getHeading(AngleUnit.RADIANS));
 
-        if( driveInput.magnitude() < DRIVE_SETPOINT_THRESHOLD )
-            return AutoUtil.AutoActionState.RUNNING;
-
-        driveInput.scaleMagnitude(-DRIVE_PROPORTIONAL * Math.pow(driveInput.magnitude(), 2));
+        driveInput.scaleMagnitude(-DRIVE_PROPORTIONAL * Math.log(10 * driveInput.magnitude()) + 1.1 );
         autoDrive(driveInput,turnToAngle(), lowGear);
 
         return AutoUtil.AutoActionState.RUNNING;
     }
+//
+//    public AutoUtil.AutoActionState driveToPose(Pose2D targetPose, boolean lowGear) {
+//        Vector driveInput = new Vector(targetPose.getX(DistanceUnit.INCH) - poseEstimator.getPose().getX(DistanceUnit.INCH),
+//             targetPose.getY(DistanceUnit.INCH) - poseEstimator.getPose().getY(DistanceUnit.INCH));
+//
+//        if ( driveInput.magnitude() < DRIVE_SETPOINT_THRESHOLD &&
+//                Math.abs( this.getPose().getHeading(AngleUnit.DEGREES) - targetPose.getHeading(AngleUnit.DEGREES) ) > TURN_SETPOINT_THRESHOLD ) {
+//            return AutoUtil.AutoActionState.FINISHED;
+//        }
+//
+//        setTargetHeading(targetPose.getHeading(AngleUnit.RADIANS));
+//    }
 
     public void setTargetHeading(double targetHeading) {
         this.targetHeading = targetHeading;

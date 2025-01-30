@@ -66,6 +66,7 @@ public class Vector {
      * unless this Vector's magnitude is 0
      *
      * @param newMagnitude the new magnitude
+     * @apiNote So this actually intakes a new magnitude instead of a constant to scale the magnitude by @JamesBurnett crashes out 1/30/25
      */
     public void scaleMagnitude(double newMagnitude) {
         double magnitude = magnitude();

@@ -41,7 +41,7 @@ public class DriveTestAuto extends LinearOpMode {
         methodSet1.add(() -> telemetry.addLine(AutoUtil.getLoopStatesReadout()));
         methodSet1.add(() -> telemetry.update());
 
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, -20, AngleUnit.DEGREES, 270 ), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, -20, AngleUnit.DEGREES, 0 ), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
 
         actionSet.clear();
@@ -49,11 +49,11 @@ public class DriveTestAuto extends LinearOpMode {
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
 
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 20, 0, AngleUnit.DEGREES, 90 ), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 20, 0, AngleUnit.DEGREES, 0 ), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
 
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 180 ), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0 ), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
 
     }

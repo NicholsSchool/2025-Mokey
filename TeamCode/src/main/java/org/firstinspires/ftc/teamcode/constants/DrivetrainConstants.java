@@ -11,7 +11,7 @@ public interface DrivetrainConstants {
     /* The threshold at which to stop auto-aligning in driveToPose */
     double TURN_SETPOINT_THRESHOLD = 3.0;
 
-    double DRIVE_PROPORTIONAL = 0.25;
+    double DRIVE_PROPORTIONAL = 0.6;
 
     /** The Maximum Speed of the Driving Profile */
     double DRIVE_PROFILE_SPEED = 10.0;
@@ -48,4 +48,7 @@ public interface DrivetrainConstants {
 
     /** Drive Motor Integral Gain */
     double DRIVE_I = 6.0;
+
+    double GO_TO_POS_P = 1.0;
+    double GO_TO_POS_D = 0.001;
 }
