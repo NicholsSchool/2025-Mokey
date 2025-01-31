@@ -4,7 +4,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -71,13 +70,13 @@ public class CompTeleOp extends OpMode {
         else elevator.setState(Elevator.ELEVATOR_STATE.GO_TO_POS);
 
         //ELEVATOR SETPOINTS
-        if (controller2.x.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO);
+        if (controller2.x.wasJustPressed()) elevator.setElevatorSetpoint(ElevatorConstants.WAYPOINT_ZERO);
 
-        if (controller2.rightBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.SPECIMEN_READY);
-        if (controller2.rightBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.SPECIMEN_PULL);
+        if (controller2.rightBumper.wasJustPressed()) elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY);
+        if (controller2.rightBumper.wasJustReleased()) elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_PULL);
 
-        if (controller2.leftBumper.wasJustPressed()) elevator.setSetpoint(ElevatorConstants.CLIMB_READY);
-        if (controller2.leftBumper.wasJustReleased()) elevator.setSetpoint(ElevatorConstants.CLIMB_PULL);
+        if (controller2.leftBumper.wasJustPressed()) elevator.setElevatorSetpoint(ElevatorConstants.CLIMB_READY);
+        if (controller2.leftBumper.wasJustReleased()) elevator.setElevatorSetpoint(ElevatorConstants.CLIMB_PULL);
 
         elevator.periodic();
 
@@ -98,7 +97,8 @@ public class CompTeleOp extends OpMode {
         intake.setWristSetpoint(controller2.triangle.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
 
         //INTAKE WHEEL
-        intake.runIntake(controller1.leftTrigger.value() - controller1.rightTrigger.value());
+        intake.runIntake(controller2.leftTrigger.value() - controller2.rightTrigger.value());
+        elevator.runArmGrabber(controller2.rightTrigger.value() - controller2.leftTrigger.value());
 
         intake.periodic();
 
@@ -106,10 +106,8 @@ public class CompTeleOp extends OpMode {
 
         telemetry.addData("Robot Pose", drivetrain.getPose().toString());
         drivetrain.sendDashboardPacket(dashboard);
-        telemetry.addData("Elevator Desired Position", elevator.pidController.getSetpoint());
+        telemetry.addData("Elevator Desired Position", elevator.elevatorPID.getSetpoint());
         telemetry.addData("Elevator Position", elevator.getEncoderPosition());
-        telemetry.addData("Intake Desired Position", elevator.pidController.getSetpoint());
-        telemetry.addData("Intake Position", intake.getIntakeSlidePos());
-        telemetry.addData("Wrist Servo Positions", Arrays.toString(intake.getWristServoPositions()));
+        telemetry.addLine(intake.getTelemetry());
     }
 }

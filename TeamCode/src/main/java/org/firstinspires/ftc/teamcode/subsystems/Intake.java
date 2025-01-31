@@ -38,16 +38,14 @@ public class Intake implements IntakeConstants {
 
     public Intake(HardwareMap hwMap) {
         slide = hwMap.get(DcMotorEx.class, "IntakeMotor");
-        slide.setDirection(DcMotorEx.Direction.REVERSE);
+        slide.setDirection(DcMotorEx.Direction.FORWARD);
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        intakeCR = hwMap.get(CRServoImplEx.class, "IntakeRight");
-        //intakeTwo = hwMap.get(CRServoImplEx.class, "IntakeRight");
+        intakeCR = hwMap.get(CRServoImplEx.class, "IntakeServo");
 
         intakeCR.setDirection(DcMotorSimple.Direction.FORWARD);
-       // intakeTwo.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intakeWristF = hwMap.get(CRServoImplEx.class, "WristFront");
         intakeWristB = hwMap.get(CRServoImplEx.class, "WristBack");
@@ -74,10 +72,10 @@ public class Intake implements IntakeConstants {
 
         switch  (intakeState) {
             case MANUAL:
-                this.intakeSetpoint = this.getIntakeSlidePos();
+                setIntakeSetpoint(getIntakeSlidePos());
                 break;
             case GO_TO_POS:
-                slideRawPower(-slidePid.calculate(getIntakeSlidePos(), intakeSetpoint));
+                slideRawPower(slidePid.calculate(getIntakeSlidePos(), intakeSetpoint));
                 break;
             case STOPPED:
             default:
@@ -118,10 +116,6 @@ public class Intake implements IntakeConstants {
         this.intakeSetpoint = intakeSetpoint;
     }
 
-    public void setPIDCoefficients(double kP, double kI, double kD) {
-        slidePid.setPID(kP, kI, kD);
-    }
-
     public void setIntakeState(INTAKE_STATE state) {
         this.intakeState = state;
     }
@@ -129,6 +123,10 @@ public class Intake implements IntakeConstants {
     public void runIntake(double power){
         intakeCR.setPower(power);
         //intakeTwo.setPower(power * INTAKE_SPEED);
+    }
+
+    public INTAKE_STATE getSlideState() {
+        return intakeState;
     }
 
     public void setWristSetpoint(WristState wristState){
@@ -146,6 +144,18 @@ public class Intake implements IntakeConstants {
     public enum WristState {
         IN,
         OUT
+    }
+
+    public String getTelemetry() {
+        StringBuilder telemBuilder = new StringBuilder();
+        String lineSep = System.lineSeparator();
+
+        telemBuilder.append("Intake Slide Setpoint: ").append(intakeSetpoint).append(lineSep);
+        telemBuilder.append("Intake Slide Real").append(getIntakeSlidePos()).append(lineSep);
+        telemBuilder.append("Wrist Desired Pos").append(wristSetpoint).append(lineSep);
+        telemBuilder.append("Wrist Real").append(getWristServoPositions()[0]).append(lineSep);
+
+        return telemBuilder.toString();
     }
 
 }

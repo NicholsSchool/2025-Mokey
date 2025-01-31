@@ -1,15 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import android.util.Log;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.math_utils.AutoUtil;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
 
@@ -18,9 +17,11 @@ import java.util.function.IntSupplier;
  */
 public class Elevator implements ElevatorConstants {
     private final DcMotorEx leftSlideMotor, rightSlideMotor;
+    private final CRServoImplEx leftArm, rightArm, armGrabber;
+    private final AnalogInput armEncoder;
     private final IntSupplier elevatorPosition;
-    public final PIDController pidController;
-    private double setpoint;
+    public final PIDController elevatorPID, armPID;
+    private double elevatorSetpoint, armSetpoint;
     private ELEVATOR_STATE state;
 
     public enum ELEVATOR_STATE
@@ -44,9 +45,16 @@ public class Elevator implements ElevatorConstants {
         rightSlideMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightSlideMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
+        leftArm = hardwareMap.get(CRServoImplEx.class, "LeftArm");
+        rightArm = hardwareMap.get(CRServoImplEx.class, "RightArm");
 
-        setpoint = 0.0;
-        pidController = new PIDController(SLIDE_P, 0.0, 0.0);
+        armEncoder = hardwareMap.get(AnalogInput.class, "ArmEncoder");
+        armGrabber = hardwareMap.get(CRServoImplEx.class, "ArmGrabber");
+
+        elevatorSetpoint = 0.0;
+        armSetpoint = 0.0;
+        elevatorPID = new PIDController(SLIDE_P, 0.0, 0.0);
+        armPID = new PIDController(0.01, 0.0, 0.0);
         this.elevatorPosition = elevatorPosition;
         this.state = ELEVATOR_STATE.GO_TO_POS;
     }
@@ -55,26 +63,36 @@ public class Elevator implements ElevatorConstants {
         switch( state )
         {
             case MANUAL:
-                this.setpoint = this.getEncoderPosition();
+                this.elevatorSetpoint = this.getEncoderPosition();
                 break;
             case GO_TO_POS:
-                slideRawPower(-pidController.calculate(this.getEncoderPosition(), this.setpoint));
+                slideRawPower(-elevatorPID.calculate(this.getEncoderPosition(), this.elevatorSetpoint));
                 break;
             case STOPPED:
             default:
                 slideRawPower(0);
         }
+
+        armRawPower(armPID.calculate(getArmPosition(), armSetpoint));
+
     }
 
     public int getEncoderPosition() { return elevatorPosition.getAsInt(); }
 
+    public double getArmPosition() {
+        return armEncoder.getVoltage() / 3.3 * 360.0;
+    }
 
-    public AutoUtil.AutoActionState setSetpoint(double setpoint) {
+    public AutoUtil.AutoActionState setElevatorSetpoint(double setpoint) {
         this.state = ELEVATOR_STATE.GO_TO_POS;
-        this.setpoint = setpoint;
+        this.elevatorSetpoint = setpoint;
         if (Math.abs(setpoint - this.getEncoderPosition()) < 500) {
             return AutoUtil.AutoActionState.FINISHED;
         } else { return AutoUtil.AutoActionState.RUNNING; }
+    }
+
+    public void setArmSetpoint(double setpoint) {
+        this.armSetpoint = setpoint;
     }
 
     public void manualControl(double power)
@@ -83,8 +101,13 @@ public class Elevator implements ElevatorConstants {
         slideRawPower(power);
     }
 
-    public void setPIDCoefficients(double kP, double kI, double kD) {
-        pidController.setPID(kP, kI, kD);
+    private void armRawPower(double power) {
+        leftArm.setPower(power);
+        rightArm.setPower(-power);
+    }
+
+    public void runArmGrabber(double power){
+        armGrabber.setPower(power);
     }
 
     private void slideRawPower(double power){

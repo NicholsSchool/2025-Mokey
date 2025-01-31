@@ -61,7 +61,7 @@ public class BlueAuto extends LinearOpMode {
 
         //Drive to chamber and set elevator to ready position
         actionSet.add( () -> drivetrain.driveToPose(new Pose2D(DistanceUnit.METER, -.06, 0.80, AngleUnit.RADIANS, 0), true) );
-        actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.SPECIMEN_READY ) );
+        actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY ) );
         AutoUtil.runActionsConcurrent(actionSet, methodSet1, TimeUnit.SECONDS, 4);
 
         //Push into submersible quickly
@@ -71,7 +71,7 @@ public class BlueAuto extends LinearOpMode {
 
         //Pull down specimen onto chamber
         actionSet.clear();
-        actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.SPECIMEN_PULL ) );
+        actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_PULL ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
 
         //Pull off of specimen
@@ -82,7 +82,7 @@ public class BlueAuto extends LinearOpMode {
         //Move from chamber to sweep location
         actionSet.clear();
         actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -.9, 1, AngleUnit.DEGREES, 270 ), true ) );
-        actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO) );
+        actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.WAYPOINT_ZERO) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1.3);
 
         //Get behind the blocks
@@ -134,7 +134,7 @@ for (int i = 0; i < 4; i++) {
         actionSet.clear();
         int finalI = i;
         actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, (-.07 - (finalI * .01)), 0.80, AngleUnit.DEGREES, 180), false ) );
-        actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.SPECIMEN_READY));
+        actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY));
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5 );
 
         //Push into submersible quickly
@@ -144,12 +144,12 @@ for (int i = 0; i < 4; i++) {
 
         //Pull down specimen onto chamber
         actionSet.clear();
-        actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.SPECIMEN_PULL ) );
+        actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_PULL ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
 
         //Bring down elevator and go to HP
         actionSet.clear();
-        actionSet.add( () -> elevator.setSetpoint(ElevatorConstants.WAYPOINT_ZERO));
+        actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.WAYPOINT_ZERO));
         actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.METER, -0.92, 1.1, AngleUnit.DEGREES, 0), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 
