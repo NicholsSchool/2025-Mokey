@@ -58,7 +58,7 @@ public class Intake implements IntakeConstants {
         wristFEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
         wristBEncoder = hwMap.get(AnalogInput.class, "WristBackEncoder");
 
-        wristSetpoint = INTAKE_WRIST_FRONT_IN;
+        wristSetpoint = INTAKE_WRIST_FRONT_OUT;
         wristFPid = new PIDController( 0.005, 0.0, 0.0 );
         wristBPid = new PIDController( 0.005, 0.0,0.0);
 
@@ -75,14 +75,14 @@ public class Intake implements IntakeConstants {
                 setIntakeSetpoint(getIntakeSlidePos());
                 break;
             case GO_TO_POS:
-                slideRawPower(slidePid.calculate(getIntakeSlidePos(), intakeSetpoint));
+                slideRawPower(-slidePid.calculate(getIntakeSlidePos(), intakeSetpoint));
                 break;
             case STOPPED:
             default:
                 slideRawPower(0);
         }
 
-        if( intakeZero.getState() ) this.resetSlideEncoder();
+        if( !intakeZero.getState() ) this.resetSlideEncoder();
 
 
         intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
@@ -151,9 +151,10 @@ public class Intake implements IntakeConstants {
         String lineSep = System.lineSeparator();
 
         telemBuilder.append("Intake Slide Setpoint: ").append(intakeSetpoint).append(lineSep);
-        telemBuilder.append("Intake Slide Real").append(getIntakeSlidePos()).append(lineSep);
-        telemBuilder.append("Wrist Desired Pos").append(wristSetpoint).append(lineSep);
-        telemBuilder.append("Wrist Real").append(getWristServoPositions()[0]).append(lineSep);
+        telemBuilder.append("Intake Slide Real: ").append(getIntakeSlidePos()).append(lineSep);
+        telemBuilder.append("Intake State: ").append(intakeState).append(lineSep);
+        telemBuilder.append("Wrist Desired Pos: ").append(wristSetpoint).append(lineSep);
+        telemBuilder.append("Wrist Real: ").append(getWristServoPositions()[0]).append(lineSep);
 
         return telemBuilder.toString();
     }

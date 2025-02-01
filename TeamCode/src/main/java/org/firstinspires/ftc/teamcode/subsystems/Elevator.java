@@ -52,9 +52,9 @@ public class Elevator implements ElevatorConstants {
         armGrabber = hardwareMap.get(CRServoImplEx.class, "ArmGrabber");
 
         elevatorSetpoint = 0.0;
-        armSetpoint = 0.0;
+        armSetpoint = ARM_DOWN;
         elevatorPID = new PIDController(SLIDE_P, 0.0, 0.0);
-        armPID = new PIDController(0.01, 0.0, 0.0);
+        armPID = new PIDController(ARM_P, 0.0, 0.0);
         this.elevatorPosition = elevatorPosition;
         this.state = ELEVATOR_STATE.GO_TO_POS;
     }
@@ -128,5 +128,20 @@ public class Elevator implements ElevatorConstants {
     public void setState(ELEVATOR_STATE state)
     {
         this.state = state;
+    }
+
+    public String getTelemetry() {
+        StringBuilder telemBuilder = new StringBuilder();
+        String lineSep = System.lineSeparator();
+
+        telemBuilder.append("Elevator Desired: ").append(elevatorSetpoint).append(lineSep);
+        telemBuilder.append("Elevator Real: ").append(getEncoderPosition()).append(lineSep);
+        telemBuilder.append("Elevator Power: ").append(leftSlideMotor.getPower()).append(lineSep);
+        telemBuilder.append("Elevator State: ").append(state).append(lineSep);
+        telemBuilder.append("Arm Desired: ").append(armSetpoint).append(lineSep);
+        telemBuilder.append("Arm Pos: ").append(getArmPosition()).append(lineSep);
+        telemBuilder.append("Arm Power: ").append(leftArm.getPower()).append(lineSep);
+
+        return telemBuilder.toString();
     }
 }

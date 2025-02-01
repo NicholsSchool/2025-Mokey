@@ -66,7 +66,7 @@ public class CompTeleOp extends OpMode {
 
         //ELEVATOR MANUAL
         if( Math.abs(controller2.leftStick.y.value()) > 0.05 )
-            elevator.manualControl( -controller2.leftStick.y.value() );
+            elevator.manualControl(controller2.leftStick.y.value() );
         else elevator.setState(Elevator.ELEVATOR_STATE.GO_TO_POS);
 
         //ELEVATOR SETPOINTS
@@ -94,7 +94,10 @@ public class CompTeleOp extends OpMode {
             intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_RETRACT);
 
         //WRIST SETPOINTS
-        intake.setWristSetpoint(controller2.triangle.isPressed() ? Intake.WristState.IN: Intake.WristState.OUT );
+        intake.setWristSetpoint(controller2.triangle.isPressed() ? Intake.WristState.OUT: Intake.WristState.IN );
+
+        //ARM SETPOINTS
+        elevator.setArmSetpoint(controller2.square.isPressed() ? ElevatorConstants.ARM_BASKET : ElevatorConstants.ARM_HANDOFF);
 
         //INTAKE WHEEL
         intake.runIntake(controller2.leftTrigger.value() - controller2.rightTrigger.value());
@@ -106,8 +109,7 @@ public class CompTeleOp extends OpMode {
 
         telemetry.addData("Robot Pose", drivetrain.getPose().toString());
         drivetrain.sendDashboardPacket(dashboard);
-        telemetry.addData("Elevator Desired Position", elevator.elevatorPID.getSetpoint());
-        telemetry.addData("Elevator Position", elevator.getEncoderPosition());
+        telemetry.addLine(elevator.getTelemetry());
         telemetry.addLine(intake.getTelemetry());
     }
 }

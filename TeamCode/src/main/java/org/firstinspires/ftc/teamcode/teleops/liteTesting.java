@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -13,7 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class liteTesting extends OpMode {
 
     private DcMotor leftClimbMotor, rightClimbMotor, slide;
-
+    private CRServoImplEx leftArm, rightArm;
     private AnalogInput armEncoder;
 
 
@@ -31,16 +32,19 @@ public class liteTesting extends OpMode {
         slide.setDirection(DcMotorEx.Direction.REVERSE);
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        armEncoder = hardwareMap.get(AnalogInput.class, "IntakeColor");
+        leftArm = hardwareMap.get(CRServoImplEx.class, "LeftArm");
+        rightArm = hardwareMap.get(CRServoImplEx.class, "RightArm");
+
+        armEncoder = hardwareMap.get(AnalogInput.class, "ArmEncoder");
     }
 
     @Override
     public void loop() {
 //        leftClimbMotor.setPower(gamepad1.left_stick_y);
 //        rightClimbMotor.setPower(gamepad1.left_stick_y);
-//        slide.setPower(gamepad1.right_stick_y);
+        slide.setPower(gamepad1.right_stick_y);
 
-        telemetry.addData("arm", armEncoder.getVoltage() / 3.3 * 360);
+//        leftArm.setPower(gamepad1.left_stick_y);
+//        rightArm.setPower(-gamepad1.left_stick_y);
     }
-
 }
