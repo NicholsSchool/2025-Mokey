@@ -6,12 +6,10 @@ package org.firstinspires.ftc.teamcode.constants;
 public interface DrivetrainConstants {
 
     /* The threshold at which to stop driving in driveToPose */
-    double DRIVE_SETPOINT_THRESHOLD = 0.6;
+    double DRIVE_SETPOINT_THRESHOLD = 1.2;
 
     /* The threshold at which to stop auto-aligning in driveToPose */
-    double TURN_SETPOINT_THRESHOLD = 3.0;
-
-    double DRIVE_PROPORTIONAL = 0.6;
+    double TURN_SETPOINT_THRESHOLD = 10.0;
 
     /** The Maximum Speed of the Driving Profile */
     double DRIVE_PROFILE_SPEED = 10.0;
@@ -49,6 +47,7 @@ public interface DrivetrainConstants {
     /** Drive Motor Integral Gain */
     double DRIVE_I = 6.0;
 
-    double GO_TO_POS_P = 1.0;
-    double GO_TO_POS_D = 0.001;
+    double GO_TO_POS_P = 0.25;
+    double GO_TO_POS_I = 0.005;
+    double GO_TO_POS_D = 0.012;
 }

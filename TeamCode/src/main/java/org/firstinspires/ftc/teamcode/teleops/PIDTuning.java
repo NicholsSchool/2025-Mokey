@@ -19,7 +19,6 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 @TeleOp(name = "PIDTuning", group = "Dev")
 public class PIDTuning extends OpMode {
 
-    private Drivetrain drivetrain;
     private Intake intake;
     private Elevator elevator;
     private Controller controller1;
@@ -28,10 +27,8 @@ public class PIDTuning extends OpMode {
 
     public void init() {
 
-        drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0), 0, false);
-        intake = new Intake(hardwareMap);
-        drivetrain.resetElevatorEncoder();
-        elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
+        intake = new Intake(hardwareMap, false);
+        elevator = new Elevator(hardwareMap, false);
         controller1 = new Controller( gamepad1 );
 
         dashboard = FtcDashboard.getInstance();
@@ -46,15 +43,15 @@ public class PIDTuning extends OpMode {
 
         intake.setIntakeSetpoint(controller1.triangle.isPressed() ? IntakeConstants.WAYPOINT_EXTEND : IntakeConstants.WAYPOINT_RETRACT);
 
-        elevator.setElevatorSetpoint( controller1.x.isPressed() ? ElevatorConstants.SPECIMEN_READY : ElevatorConstants.SPECIMEN_PULL);
+        elevator.setElevatorSetpoint( controller1.x.isPressed() ? -1000 : -200);
 
         telemetry.addData("intake desired", controller1.triangle.isPressed() ? IntakeConstants.WAYPOINT_EXTEND : IntakeConstants.WAYPOINT_RETRACT);
         telemetry.addData("intake real", -intake.getIntakeSlidePos());
-        telemetry.addData("elevator desired", controller1.x.isPressed() ? ElevatorConstants.SPECIMEN_READY : ElevatorConstants.SPECIMEN_PULL);
+        telemetry.addData("elevator desired", controller1.x.isPressed() ? -1000 : -200);
         telemetry.addData("elevator real", elevator.getEncoderPosition());
 
-        intake.periodic();
-        //elevator.periodic();
+        //intake.periodic();
+        elevator.periodic();
 
     }
 

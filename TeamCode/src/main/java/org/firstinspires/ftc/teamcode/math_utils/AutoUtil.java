@@ -16,7 +16,6 @@ public class AutoUtil {
         FINISHED
     }
 
-    private static int actionSetIndex = 0;
 
     private static BooleanSupplier isActive;
 
@@ -43,7 +42,7 @@ public class AutoUtil {
             List<Callable<AutoActionState>> actions, List<Runnable> utilMethods,
             TimeUnit timeLimitUnit, double timeLimit) {
 
-        actionSetIndex++;
+        if (actions.isEmpty()) return;
 
         //Reset Timer and Loop States
         timer.reset();
@@ -51,7 +50,6 @@ public class AutoUtil {
         Arrays.fill(loopStates, AutoActionState.IDLE);
         //While the states are not all FINISHED, run each action in sequence. Then, run each
         //other method in sequence. If the time limit is reached, exit the method.
-        if(!isActive.getAsBoolean()) return;
         while (!Arrays.stream(loopStates).allMatch(state -> state == AutoActionState.FINISHED) ) {
             if(!isActive.getAsBoolean()) return;
             for (int i = 0; i < actions.size(); i++) {
@@ -101,9 +99,6 @@ public class AutoUtil {
      */
     public static String toString(AutoActionState[] states) {
         StringBuilder builder = new StringBuilder();
-        builder.append("Set Index: ")
-                .append(actionSetIndex)
-                .append(System.lineSeparator());
         for (int i = 0; i < states.length; i++) {
             builder.append(i)
                 .append(": ")
@@ -137,7 +132,5 @@ public class AutoUtil {
      * @return The AutoActionStates
      */
     public static AutoActionState[] getLoopStates() { return loopStates; }
-
-    public static int getActionSetIndex() { return actionSetIndex; }
 
 }

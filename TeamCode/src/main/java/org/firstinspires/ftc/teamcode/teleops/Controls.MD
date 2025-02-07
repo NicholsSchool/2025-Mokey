@@ -3,10 +3,14 @@
 - Left Stick: Move Robot Field Oriented
 - Right Stick: Turn Robot
 - Share Button: Reset IMU heading
-- Circle/B: Auto-Align 0
-- Square/X: Auto-Align 90
-- Triangle/Y: Auto-Align 180
-- Cross/A: Auto-Align 270
+
+[//]: # (- Circle/B: Auto-Align 0)
+
+[//]: # (- Square/X: Auto-Align 90)
+
+[//]: # (- Triangle/Y: Auto-Align 180)
+
+[//]: # (- Cross/A: Auto-Align 270)
 
 **Operator OI**
 

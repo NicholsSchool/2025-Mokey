@@ -33,7 +33,10 @@ public class Drivetrain implements DrivetrainConstants {
     private double targetHeading;
     private final double fieldOrientedForward;
     private final OpticalSensor od;
-    private final PIDController pidControllerX, pidControllerY;
+    private final PIDController drivePID;
+    public double goToPosDistance;
+    private Pose2D setpoint = new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.RADIANS, 0);
+    private Vector PIDDriveVector = new Vector(0 ,0);
 
     /**
      * Initializes the Drivetrain subsystem
@@ -69,11 +72,10 @@ public class Drivetrain implements DrivetrainConstants {
         rightDrive.setVelocityPIDFCoefficients(DRIVE_P, DRIVE_I, 0.0, 0.0);
         backDrive.setVelocityPIDFCoefficients(DRIVE_P, DRIVE_I, 0.0, 0.0);
 
-        pidControllerX = new PIDController( GO_TO_POS_P, 0.0, GO_TO_POS_D);
-        pidControllerY = new PIDController( GO_TO_POS_P, 0.0, GO_TO_POS_D );
+        drivePID = new PIDController( GO_TO_POS_P, GO_TO_POS_I, GO_TO_POS_D);
 
-        leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.GREEN);
-        rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.GREEN);
+        leftLight = new IndicatorLight(hwMap, "LeftLight", IndicatorLight.Colour.RED);
+        rightLight = new IndicatorLight(hwMap, "RightLight", IndicatorLight.Colour.RED);
 
         driveProfile = new VectorMotionProfile(DRIVE_PROFILE_SPEED);
         turnProfile = new MotionProfile(TURN_PROFILE_SPEED, TURN_PROFILE_MAX);
@@ -118,18 +120,33 @@ public class Drivetrain implements DrivetrainConstants {
     }
 
     public AutoUtil.AutoActionState driveToPose(Pose2D targetPose, boolean lowGear){
-        Vector driveInput = new Vector(targetPose.getX(DistanceUnit.INCH) - poseEstimator.getPose().getX(DistanceUnit.INCH),
+        this.setpoint = targetPose;
+        Vector diffVector = new Vector(targetPose.getX(DistanceUnit.INCH) - poseEstimator.getPose().getX(DistanceUnit.INCH),
                 targetPose.getY(DistanceUnit.INCH) - poseEstimator.getPose().getY(DistanceUnit.INCH));
 
-        if ( driveInput.magnitude() < DRIVE_SETPOINT_THRESHOLD &&
-                Math.abs( this.getPose().getHeading(AngleUnit.DEGREES) - targetPose.getHeading(AngleUnit.DEGREES) ) > TURN_SETPOINT_THRESHOLD ) {
+        goToPosDistance = diffVector.magnitude();
+
+        if ( diffVector.magnitude() < DRIVE_SETPOINT_THRESHOLD &&
+                Math.abs( this.getPose().getHeading(AngleUnit.DEGREES) - targetPose.getHeading(AngleUnit.DEGREES) ) < TURN_SETPOINT_THRESHOLD ) {
             return AutoUtil.AutoActionState.FINISHED;
         }
 
+        double driveMagnitude = drivePID.calculate(diffVector.magnitude(), 0);
+        double driveAngle = diffVector.angle();
+
+        Vector driveInput = new Vector(
+
+                driveMagnitude * Math.cos(driveAngle),
+                driveMagnitude * Math.sin(driveAngle)
+        );
+
+        driveInput.clipMagnitude(1.0);
+
+        PIDDriveVector = driveInput;
+
         setTargetHeading(targetPose.getHeading(AngleUnit.RADIANS));
 
-        driveInput.scaleMagnitude(-DRIVE_PROPORTIONAL * Math.log(10 * driveInput.magnitude()) + 1.1 );
-        autoDrive(driveInput,turnToAngle(), lowGear);
+        autoDrive(driveInput, turnToAngle(), lowGear);
 
         return AutoUtil.AutoActionState.RUNNING;
     }
@@ -173,6 +190,15 @@ public class Drivetrain implements DrivetrainConstants {
                         poseEstimator.getPose().getY(DistanceUnit.INCH),
                         poseEstimator.getPose().getX(DistanceUnit.INCH) + (9 * Math.cos(poseEstimator.getPose().getHeading(AngleUnit.RADIANS))),
                         poseEstimator.getPose().getY(DistanceUnit.INCH) + (9 * Math.sin(poseEstimator.getPose().getHeading(AngleUnit.RADIANS)))
+                )
+                .setStroke("Purple")
+                .strokeCircle(setpoint.getX(DistanceUnit.INCH), setpoint.getY(DistanceUnit.INCH), DRIVE_SETPOINT_THRESHOLD)
+                .setStroke("Cyan")
+                .strokeLine(
+                        poseEstimator.getPose().getX(DistanceUnit.INCH),
+                        poseEstimator.getPose().getY(DistanceUnit.INCH),
+                        poseEstimator.getPose().getX(DistanceUnit.INCH) + PIDDriveVector.x,
+                        poseEstimator.getPose().getY(DistanceUnit.INCH) + PIDDriveVector.y
                 );
         dashboard.sendTelemetryPacket(packet);
     }
@@ -180,11 +206,6 @@ public class Drivetrain implements DrivetrainConstants {
     public Pose2D getPose() { return poseEstimator.getPose(); }
 
     public void resetIMU() { od.resetHeading(); }
-
-    public void resetElevatorEncoder() {
-        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
 
     public int getElevatorPosition() {
         return backDrive.getCurrentPosition();

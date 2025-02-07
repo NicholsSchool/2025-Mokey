@@ -17,8 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystems.components.IndicatorLight;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 
-import java.util.Arrays;
-
 @TeleOp(name="[COMP] TeleOp", group="Dev")
 public class CompTeleOp extends OpMode {
 
@@ -34,9 +32,11 @@ public class CompTeleOp extends OpMode {
     public void init() {
         Pose2D initPose = new Pose2D(DistanceUnit.INCH, -24, 54, AngleUnit.DEGREES, 0);
         drivetrain = new Drivetrain(hardwareMap, initPose, 270, false);
-        elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
-        drivetrain.resetElevatorEncoder();
-        intake = new Intake(hardwareMap);
+        elevator = new Elevator(hardwareMap, true);
+        intake = new Intake(hardwareMap, true);
+
+        intake.resetSlideEncoder();
+        elevator.resetSlideEncoder();
 
         dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
@@ -45,6 +45,9 @@ public class CompTeleOp extends OpMode {
         controller1 = new Controller(gamepad1);
         controller2 = new Controller(gamepad2);
 
+
+        drivetrain.leftLight.setColour(IndicatorLight.Colour.GREEN);
+        drivetrain.rightLight.setColour(IndicatorLight.Colour.GREEN);
     }
 
     public void loop() {
@@ -66,7 +69,7 @@ public class CompTeleOp extends OpMode {
 
         //ELEVATOR MANUAL
         if( Math.abs(controller2.leftStick.y.value()) > 0.05 )
-            elevator.manualControl(controller2.leftStick.y.value() );
+            elevator.manualControl( -controller2.leftStick.y.value() );
         else elevator.setState(Elevator.ELEVATOR_STATE.GO_TO_POS);
 
         //ELEVATOR SETPOINTS
@@ -75,14 +78,11 @@ public class CompTeleOp extends OpMode {
         if (controller2.rightBumper.wasJustPressed()) elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY);
         if (controller2.rightBumper.wasJustReleased()) elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_PULL);
 
-        if (controller2.leftBumper.wasJustPressed()) elevator.setElevatorSetpoint(ElevatorConstants.CLIMB_READY);
-        if (controller2.leftBumper.wasJustReleased()) elevator.setElevatorSetpoint(ElevatorConstants.CLIMB_PULL);
-
         elevator.periodic();
 
         //INTAKE MANUAL
         if ( Math.abs(controller2.rightStick.y.value()) > 0.05 ) {
-            intake.manualControl(-controller2.rightStick.toVector().y);
+            intake.manualControl(controller2.rightStick.toVector().y);
         } else {
             intake.setIntakeState(Intake.INTAKE_STATE.GO_TO_POS);
         }
@@ -94,7 +94,11 @@ public class CompTeleOp extends OpMode {
             intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_RETRACT);
 
         //WRIST SETPOINTS
-        intake.setWristSetpoint(controller2.triangle.isPressed() ? Intake.WristState.OUT: Intake.WristState.IN );
+        if (controller2.triangle.isPressed() && intake.getIntakeSlidePos() < IntakeConstants.WAYPOINT_STOW) {
+            intake.setWristSetpoint(Intake.WristState.UP);
+        } else if (controller2.triangle.isPressed() && intake.getIntakeSlidePos() > IntakeConstants.WAYPOINT_STOW) {
+            intake.setWristSetpoint(Intake.WristState.DOWN);
+        } else {intake.setWristSetpoint(Intake.WristState.STOW); }
 
         //ARM SETPOINTS
         elevator.setArmSetpoint(controller2.square.isPressed() ? ElevatorConstants.ARM_BASKET : ElevatorConstants.ARM_HANDOFF);

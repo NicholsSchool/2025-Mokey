@@ -5,26 +5,25 @@ import com.qualcomm.robotcore.hardware.CRServoImplEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.constants.IntakeConstants;
+import org.firstinspires.ftc.teamcode.math_utils.AutoUtil;
 import org.firstinspires.ftc.teamcode.math_utils.PIDController;
 //import org.firstinspires.ftc.teamcode.subsystems.components.OctoEncoder;
 
 public class Intake implements IntakeConstants {
     private final DcMotorEx slide;
-//    private final OctoEncoder slideEncoder;
-    private final CRServoImplEx intakeWristF, intakeWristB;
+    private final CRServoImplEx intakeWristF;
     private final CRServoImplEx intakeCR;
-    private final AnalogInput wristFEncoder, wristBEncoder;
+    private final AnalogInput wristEncoder;
 
     private double intakeSetpoint;
     private double wristSetpoint;
-    private final PIDController slidePid;
-    private final PIDController wristFPid;
-    private final PIDController wristBPid;
+    private final PIDController slidePID;
+    private final PIDController wristPID;
     private final DigitalChannelImpl intakeZero;
 
     private INTAKE_STATE intakeState;
@@ -36,7 +35,7 @@ public class Intake implements IntakeConstants {
         STOPPED
     }
 
-    public Intake(HardwareMap hwMap) {
+    public Intake(HardwareMap hwMap, boolean suppressEncoderReset) {
         slide = hwMap.get(DcMotorEx.class, "IntakeMotor");
         slide.setDirection(DcMotorEx.Direction.FORWARD);
         slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -48,54 +47,49 @@ public class Intake implements IntakeConstants {
         intakeCR.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intakeWristF = hwMap.get(CRServoImplEx.class, "WristFront");
-        intakeWristB = hwMap.get(CRServoImplEx.class, "WristBack");
 
         intakeWristF.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeWristB.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intakeZero = hwMap.get(DigitalChannelImpl.class, "IntakeMagnet");
 
-        wristFEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
-        wristBEncoder = hwMap.get(AnalogInput.class, "WristBackEncoder");
+        wristEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
 
-        wristSetpoint = INTAKE_WRIST_FRONT_OUT;
-        wristFPid = new PIDController( 0.005, 0.0, 0.0 );
-        wristBPid = new PIDController( 0.005, 0.0,0.0);
+        wristSetpoint = WRIST_STOW;
+        wristPID = new PIDController( WRIST_P, 0.0, 0.0 );
 
         intakeSetpoint = 0.0;
-        slidePid = new PIDController(SLIDE_P, 0.0, 0.0 );
+        slidePID = new PIDController(SLIDE_P, 0.0, 0.0 );
+
+        if (!suppressEncoderReset) resetSlideEncoder();
 
         intakeState = INTAKE_STATE.STOPPED;
     }
 
     public void periodic() {
 
+        if( !intakeZero.getState() ) this.resetSlideEncoder();
+
         switch  (intakeState) {
             case MANUAL:
-                setIntakeSetpoint(getIntakeSlidePos());
+                this.intakeSetpoint = getIntakeSlidePos();
                 break;
             case GO_TO_POS:
-                slideRawPower(-slidePid.calculate(getIntakeSlidePos(), intakeSetpoint));
+                slideRawPower(slidePID.calculate(getIntakeSlidePos(), intakeSetpoint));
                 break;
             case STOPPED:
             default:
                 slideRawPower(0);
         }
 
-        if( !intakeZero.getState() ) this.resetSlideEncoder();
-
-
-        intakeWristF.setPower( -wristFPid.calculate( this.getWristServoPositions()[0], ( wristSetpoint ) ) );
-        intakeWristB.setPower( -wristBPid.calculate( this.getWristServoPositions()[1], wristSetpoint - 75) );
+        intakeWristF.setPower( -wristPID.calculate( this.getWristServoPositions(), ( wristSetpoint ) ) );
     }
 
     public int getIntakeSlidePos() { return slide.getCurrentPosition(); }
 
-    public double getEncoderVelocity() { return slide.getVelocity(); }
-
-    public double[] getWristServoPositions() {
-        return new double[]{ wristFEncoder.getVoltage() / 3.3 * 360.0, wristBEncoder.getVoltage() / 3.3 * 360.0} ;
+    public double getWristServoPositions() {
+        return wristEncoder.getVoltage() / 3.3 * 360.0;
     }
+
     private void slideRawPower(double power){
         slide.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         slide.setPower(power);
@@ -103,6 +97,11 @@ public class Intake implements IntakeConstants {
 
     public void manualControl(double power){
        this.intakeState = INTAKE_STATE.MANUAL;
+       //break for soft limit
+       if ((!intakeZero.getState() || getIntakeSlidePos() < -1000) && power < 0) { return; }
+       //half power throttle for overcurrent
+       if( slide.getCurrent(CurrentUnit.AMPS) > SLIDE_CURRENT_LIMIT ) { slideRawPower(0.5 * power); return; }
+
        slideRawPower(power);
     }
 
@@ -111,9 +110,13 @@ public class Intake implements IntakeConstants {
         slide.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setIntakeSetpoint(double intakeSetpoint){
+    public AutoUtil.AutoActionState setIntakeSetpoint(double intakeSetpoint){
         this.intakeState = INTAKE_STATE.GO_TO_POS;
+        if (Math.abs(intakeSetpoint - this.getIntakeSlidePos()) < 500) {
+            return AutoUtil.AutoActionState.FINISHED;
+        }
         this.intakeSetpoint = intakeSetpoint;
+        return AutoUtil.AutoActionState.RUNNING;
     }
 
     public void setIntakeState(INTAKE_STATE state) {
@@ -130,20 +133,27 @@ public class Intake implements IntakeConstants {
     }
 
     public void setWristSetpoint(WristState wristState){
+
         switch( wristState )
         {
-            case IN:
-                wristSetpoint = INTAKE_WRIST_FRONT_IN;
+            case UP:
+                wristSetpoint = WRIST_UP;
                 break;
-            case OUT:
-                wristSetpoint = INTAKE_WRIST_FRONT_OUT;
+            case DOWN:
+                int slidePos = getIntakeSlidePos();
+                wristSetpoint = (WRIST_DOWN_A * slidePos * slidePos) + (WRIST_DOWN_B * slidePos) + WRIST_DOWN_C;
+                //quadratic regression
+                break;
+            case STOW:
+                wristSetpoint = WRIST_STOW;
                 break;
         }
     }
 
     public enum WristState {
-        IN,
-        OUT
+        UP,
+        DOWN,
+        STOW
     }
 
     public String getTelemetry() {
@@ -154,7 +164,7 @@ public class Intake implements IntakeConstants {
         telemBuilder.append("Intake Slide Real: ").append(getIntakeSlidePos()).append(lineSep);
         telemBuilder.append("Intake State: ").append(intakeState).append(lineSep);
         telemBuilder.append("Wrist Desired Pos: ").append(wristSetpoint).append(lineSep);
-        telemBuilder.append("Wrist Real: ").append(getWristServoPositions()[0]).append(lineSep);
+        telemBuilder.append("Wrist Real: ").append(getWristServoPositions()).append(lineSep);
 
         return telemBuilder.toString();
     }

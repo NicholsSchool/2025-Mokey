@@ -14,8 +14,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class liteTesting extends OpMode {
 
     private DcMotor leftClimbMotor, rightClimbMotor, slide;
-    private CRServoImplEx leftArm, rightArm;
-    private AnalogInput armEncoder;
+    private CRServoImplEx leftArm, rightArm, intakeWrist;
+    private AnalogInput armEncoder, wristEncoder;
 
 
     @Override
@@ -23,28 +23,39 @@ public class liteTesting extends OpMode {
         leftClimbMotor = hardwareMap.get(DcMotor.class, "LeftClimberMotor");
         rightClimbMotor = hardwareMap.get(DcMotor.class, "RightClimberMotor");
 
-        leftClimbMotor.setDirection(DcMotor.Direction.REVERSE);
-        leftClimbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftClimbMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftClimbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightClimbMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftClimbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftClimbMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        rightClimbMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightClimbMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         slide = hardwareMap.get(DcMotorEx.class, "IntakeMotor");
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slide.setDirection(DcMotorEx.Direction.REVERSE);
-        slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
 
         leftArm = hardwareMap.get(CRServoImplEx.class, "LeftArm");
         rightArm = hardwareMap.get(CRServoImplEx.class, "RightArm");
 
         armEncoder = hardwareMap.get(AnalogInput.class, "ArmEncoder");
+
+        intakeWrist = hardwareMap.get(CRServoImplEx.class, "WristFront");
+        wristEncoder = hardwareMap.get(AnalogInput.class, "WristFrontEncoder");
     }
 
     @Override
     public void loop() {
-//        leftClimbMotor.setPower(gamepad1.left_stick_y);
-//        rightClimbMotor.setPower(gamepad1.left_stick_y);
-        slide.setPower(gamepad1.right_stick_y);
 
-//        leftArm.setPower(gamepad1.left_stick_y);
-//        rightArm.setPower(-gamepad1.left_stick_y);
+        slide.setPower(gamepad1.left_stick_y);
+        intakeWrist.setPower(gamepad1.right_stick_y);
+
+        telemetry.addData("Elevator Real", rightClimbMotor.getCurrentPosition());
+        telemetry.addData("Intake Real", slide.getCurrentPosition());
+        telemetry.addData("Wrist Real", (wristEncoder.getVoltage() / 3.3 * 360.0));
+        telemetry.update();
+
     }
 }
