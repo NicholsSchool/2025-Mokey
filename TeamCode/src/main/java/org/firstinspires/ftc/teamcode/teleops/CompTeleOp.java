@@ -112,6 +112,7 @@ public class CompTeleOp extends OpMode {
         drivetrain.drive(controller1.leftStick.toVector(), controller1.rightStick.toVector().x, false);
 
         telemetry.addData("Robot Pose", drivetrain.getPose().toString());
+        telemetry.addData("Yaw Rate", drivetrain.getYawVelo() );
         drivetrain.sendDashboardPacket(dashboard);
         telemetry.addLine(elevator.getTelemetry());
         telemetry.addLine(intake.getTelemetry());

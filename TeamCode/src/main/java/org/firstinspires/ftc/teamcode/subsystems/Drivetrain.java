@@ -121,6 +121,10 @@ public class Drivetrain implements DrivetrainConstants {
 
     public AutoUtil.AutoActionState driveToPose(Pose2D targetPose, boolean lowGear){
         this.setpoint = targetPose;
+
+        if( poseEstimator.getPose() == null )
+            return AutoUtil.AutoActionState.RUNNING;
+
         Vector diffVector = new Vector(targetPose.getX(DistanceUnit.INCH) - poseEstimator.getPose().getX(DistanceUnit.INCH),
                 targetPose.getY(DistanceUnit.INCH) - poseEstimator.getPose().getY(DistanceUnit.INCH));
 
@@ -178,7 +182,7 @@ public class Drivetrain implements DrivetrainConstants {
         packet.fieldOverlay()
                 .setAlpha(0.7)
                 .setStrokeWidth(1)
-                .setStroke("Red")
+                .setStroke(poseEstimator.isUsingLL ? "Green" : "Red")
                 .strokeCircle(
                         poseEstimator.getPose().getX(DistanceUnit.INCH),
                         poseEstimator.getPose().getY(DistanceUnit.INCH),
@@ -201,6 +205,10 @@ public class Drivetrain implements DrivetrainConstants {
                         poseEstimator.getPose().getY(DistanceUnit.INCH) + PIDDriveVector.y
                 );
         dashboard.sendTelemetryPacket(packet);
+    }
+
+    public double getYawVelo() {
+        return poseEstimator.otos.getYawRate();
     }
 
     public Pose2D getPose() { return poseEstimator.getPose(); }

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems.components;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -7,20 +9,24 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.teamcode.math_utils.Point;
 
 import java.util.Optional;
+import java.util.function.DoubleSupplier;
 
 public class LimelightComponent {
     
     private final Limelight3A limelight3A;
+    private final DoubleSupplier yawRate;
 
     /**
      * Constructs a limelight subsytem.
      */
-    public LimelightComponent(final HardwareMap hwMap )
+    public LimelightComponent(final HardwareMap hwMap, DoubleSupplier yawRate )
     {
         this.limelight3A = hwMap.get(Limelight3A.class, "limelight");
         limelight3A.setPollRateHz(11);
         limelight3A.pipelineSwitch(0);
         limelight3A.start();
+
+        this.yawRate = yawRate;
     }
 
     /**
@@ -44,16 +50,19 @@ public class LimelightComponent {
     public Optional<Point> getRobotPose()
     {
         LLResult result = limelight3A.getLatestResult();
-        if( result == null || !result.isValid() || result.getBotposeAvgDist() > 2 ) // 2 meters max dist
+        Log.i("LIMELIGHT", "GOT POSE");
+        if( result == null || !isValidResult(result) ) // 2 meters max dist
             return Optional.empty();
+        Log.i("LIMELIGHT", "USING LL");
        return Optional.of(new Point(result.getBotpose_MT2().getPosition().x, result.getBotpose_MT2().getPosition().y));
     }
 
-    public Optional<Point> getRobotPose( double yaw )
+    private boolean isValidResult( final LLResult result )
     {
-        this.updateWithPose(yaw);
-        return this.getRobotPose();
+        Log.i("LIMELIGHT_STDEV_X", String.valueOf(result.getStddevMt2()[0]));
+        Log.i("LIMELIGHT_STDEV_Y", String.valueOf(result.getStddevMt2()[1]));
+        return result.isValid() &&
+                Math.abs(result.getStddevMt2()[0]) < 0.2 && Math.abs(result.getStddevMt2()[1]) < 0.2;
     }
-
 
 }

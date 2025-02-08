@@ -34,13 +34,12 @@ public class PoseEstimator {
     public PoseEstimator(HardwareMap hwMap, Pose2D initialPose, boolean useLL) {
         this.useLL = useLL;
         Optional<Point> LLPose = Optional.empty();
+        otos = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.DEGREES);
         if (useLL) {
-            limelight = new LimelightComponent(hwMap);
+            limelight = new LimelightComponent(hwMap, otos::getYawRate);
             limelight.updateWithPose(initialPose.getHeading(AngleUnit.DEGREES));
             LLPose = limelight.getRobotPose();
         }
-
-        otos = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.DEGREES);
 
         //If the limelight can localize at startup, use that for the initial pose.
         if (useLL && LLPose.isPresent() ) {

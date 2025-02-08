@@ -23,6 +23,10 @@ public class AutoUtil {
 
     private static final ElapsedTime timer = new ElapsedTime();
 
+    private static final ElapsedTime loopTimer = new ElapsedTime();
+
+    private static double loopTime = 0.0;
+
     public static void supplyOpModeActive(BooleanSupplier opModeIsActive) {
         isActive = opModeIsActive;
     }
@@ -52,6 +56,7 @@ public class AutoUtil {
         //other method in sequence. If the time limit is reached, exit the method.
         while (!Arrays.stream(loopStates).allMatch(state -> state == AutoActionState.FINISHED) ) {
             if(!isActive.getAsBoolean()) return;
+            loopTimer.reset();
             for (int i = 0; i < actions.size(); i++) {
                     if(!isActive.getAsBoolean()) return;
                     if (loopStates[i] != AutoActionState.FINISHED) {
@@ -62,6 +67,7 @@ public class AutoUtil {
             for (Runnable method: utilMethods) {
                 method.run();
             }
+            loopTime = loopTimer.milliseconds();
             if (timer.time(timeLimitUnit) >= timeLimit) { return; }
 
         }
@@ -78,9 +84,11 @@ public class AutoUtil {
         timer.reset();
         while (timer.time(unit) < time) {
             if (!isActive.getAsBoolean()) { return; }
+            loopTimer.reset();
             for (Runnable method: methods) {
                 method.run();
             }
+            loopTime = loopTimer.milliseconds();
         }
     }
 
@@ -132,5 +140,7 @@ public class AutoUtil {
      * @return The AutoActionStates
      */
     public static AutoActionState[] getLoopStates() { return loopStates; }
+
+    public static double getLoopTime() { return loopTime; }
 
 }

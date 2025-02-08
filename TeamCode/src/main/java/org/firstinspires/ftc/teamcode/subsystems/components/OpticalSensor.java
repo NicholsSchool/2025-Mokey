@@ -65,4 +65,8 @@ public class OpticalSensor {
 
     public void resetHeading() { otos.setPosition( new SparkFunOTOS.Pose2D( pos.x, pos.y, 0.0 ) ); }
 
+    public double getYawRate() {
+        return otos.getVelocity().h;
+    }
+
 }
