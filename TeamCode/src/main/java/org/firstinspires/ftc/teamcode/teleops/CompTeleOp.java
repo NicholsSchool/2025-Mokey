@@ -31,7 +31,7 @@ public class CompTeleOp extends OpMode {
     @Override
     public void init() {
         Pose2D initPose = new Pose2D(DistanceUnit.INCH, -24, 54, AngleUnit.DEGREES, 0);
-        drivetrain = new Drivetrain(hardwareMap, initPose, 270, false);
+        drivetrain = new Drivetrain(hardwareMap, initPose, 270, false, true);
         elevator = new Elevator(hardwareMap, true);
         intake = new Intake(hardwareMap, true);
 
@@ -62,10 +62,10 @@ public class CompTeleOp extends OpMode {
         if (controller1.share.wasJustPressed()) drivetrain.resetIMU();
 
         //AUTO ALIGN
-        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
-        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
-        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
-        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
+//        if (controller1.circle.wasJustPressed()) drivetrain.setTargetHeading(0);
+//        if (controller1.square.wasJustPressed()) drivetrain.setTargetHeading(Math.PI);
+//        if (controller1.triangle.wasJustPressed()) drivetrain.setTargetHeading(Math.PI / 2);
+//        if (controller1.x.wasJustPressed()) drivetrain.setTargetHeading(3 * Math.PI / 2);
 
         //ELEVATOR MANUAL
         if( Math.abs(controller2.leftStick.y.value()) > 0.05 )
@@ -82,23 +82,24 @@ public class CompTeleOp extends OpMode {
 
         //INTAKE MANUAL
         if ( Math.abs(controller2.rightStick.y.value()) > 0.05 ) {
-            intake.manualControl(controller2.rightStick.toVector().y);
+            intake.slideManual(controller2.rightStick.toVector().y);
         } else {
             intake.setIntakeState(Intake.INTAKE_STATE.GO_TO_POS);
         }
 
-        //INTAKE SETPOINTS
-        if( controller2.dpadUp.wasJustPressed() )
-            intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_EXTEND);
-        if( controller2.dpadDown.wasJustPressed())
-            intake.setIntakeSetpoint(IntakeConstants.WAYPOINT_RETRACT);
+        //WRIST MANUAL
+        if( controller2.dpadUp.isPressed() )
+            intake.wristManual(1);
+        else if( controller2.dpadDown.wasJustPressed())
+            intake.wristManual(-1);
+        else intake.setWristState(Intake.WRIST_STATE.GO_TO_POS);
 
         //WRIST SETPOINTS
         if (controller2.triangle.isPressed() && intake.getIntakeSlidePos() < IntakeConstants.WAYPOINT_STOW) {
-            intake.setWristSetpoint(Intake.WristState.UP);
+            intake.setWristSetpoint(Intake.WRIST_SETPOINT.UP);
         } else if (controller2.triangle.isPressed() && intake.getIntakeSlidePos() > IntakeConstants.WAYPOINT_STOW) {
-            intake.setWristSetpoint(Intake.WristState.DOWN);
-        } else {intake.setWristSetpoint(Intake.WristState.STOW); }
+            intake.setWristSetpoint(Intake.WRIST_SETPOINT.DOWN);
+        } else {intake.setWristSetpoint(Intake.WRIST_SETPOINT.STOW); }
 
         //ARM SETPOINTS
         elevator.setArmSetpoint(controller2.square.isPressed() ? ElevatorConstants.ARM_BASKET : ElevatorConstants.ARM_HANDOFF);

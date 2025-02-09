@@ -32,7 +32,6 @@ public class Drivetrain implements DrivetrainConstants {
     public PoseEstimator poseEstimator;
     private double targetHeading;
     private final double fieldOrientedForward;
-    private final OpticalSensor od;
     private final PIDController drivePID;
     public double goToPosDistance;
     private Pose2D setpoint = new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.RADIANS, 0);
@@ -46,11 +45,10 @@ public class Drivetrain implements DrivetrainConstants {
      * @param fieldOrientedForward the field direction that the robot drives when turn angle is 0 (in degrees)
      *                             !IMPORTANT! For autos, this should be 270.
      */
-    public Drivetrain(HardwareMap hwMap, Pose2D initialPose, double fieldOrientedForward, boolean useLL) {
+    public Drivetrain(HardwareMap hwMap, Pose2D initialPose, double fieldOrientedForward, boolean useLL, boolean suppressHeadingReset) {
         this.targetHeading = initialPose.getHeading(AngleUnit.RADIANS);
         this.fieldOrientedForward = Math.toRadians(fieldOrientedForward) - Math.PI / 2;
-        od = new OpticalSensor("OTOS", hwMap, DistanceUnit.INCH, AngleUnit.RADIANS);
-        poseEstimator = new PoseEstimator(hwMap, initialPose, useLL);
+        poseEstimator = new PoseEstimator(hwMap, initialPose, useLL, suppressHeadingReset);
 
         leftDrive = hwMap.get(DcMotorEx.class, "LeftDriveMotor");
         rightDrive = hwMap.get(DcMotorEx.class, "RightDriveMotor");
@@ -213,9 +211,9 @@ public class Drivetrain implements DrivetrainConstants {
 
     public Pose2D getPose() { return poseEstimator.getPose(); }
 
-    public void resetIMU() { od.resetHeading(); }
+    public void resetIMU() { poseEstimator.resetOTOSIMU(); }
 
-    public int getElevatorPosition() {
-        return backDrive.getCurrentPosition();
+    public void stop() {
+        runDriveMotors(0);
     }
 }

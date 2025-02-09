@@ -29,7 +29,7 @@ public class PoseTesting extends OpMode {
     public void init() {
 
         Pose2D initialPose = new Pose2D(DistanceUnit.INCH, 0, 48, AngleUnit.DEGREES, 270);
-        drivetrain = new Drivetrain(hardwareMap, initialPose, 270, true);
+        drivetrain = new Drivetrain(hardwareMap, initialPose, 270, true, true);
         poseEstimator = drivetrain.poseEstimator;
         driverOI = new Controller(gamepad1);
         dashboard = FtcDashboard.getInstance();

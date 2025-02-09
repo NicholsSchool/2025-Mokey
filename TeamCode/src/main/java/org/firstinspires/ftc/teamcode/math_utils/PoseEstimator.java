@@ -31,10 +31,10 @@ public class PoseEstimator {
      * @param hwMap OpMode Hardware Map passthrough for LL, OTOS, and Gyro initialization.
      * @param initialPose Pose2D for robot's initial field-relative position.
      */
-    public PoseEstimator(HardwareMap hwMap, Pose2D initialPose, boolean useLL) {
+    public PoseEstimator(HardwareMap hwMap, Pose2D initialPose, boolean useLL, boolean suppressOTOSReset) {
         this.useLL = useLL;
         Optional<Point> LLPose = Optional.empty();
-        otos = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.DEGREES);
+        otos = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.DEGREES, suppressOTOSReset);
         if (useLL) {
             limelight = new LimelightComponent(hwMap, otos::getYawRate);
             limelight.updateWithPose(initialPose.getHeading(AngleUnit.DEGREES));
@@ -131,6 +131,10 @@ public class PoseEstimator {
         Vector transformedPos = transformFieldOriented(otosPos);
 
         return new Pose2D(DistanceUnit.METER, initialPose.getX(DistanceUnit.METER) + transformedPos.x, initialPose.getY(DistanceUnit.METER) + transformedPos.y, AngleUnit.DEGREES, getFieldHeading(AngleUnit.DEGREES));
+    }
+
+    public void resetOTOSIMU(){
+        otos.resetHeading();
     }
 
 }

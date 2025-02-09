@@ -27,12 +27,23 @@ public class Intake implements IntakeConstants {
     private final DigitalChannelImpl intakeZero;
 
     private INTAKE_STATE intakeState;
+    private WRIST_STATE wristState;
 
-    public enum INTAKE_STATE
-    {
+    public enum INTAKE_STATE {
         MANUAL,
         GO_TO_POS,
         STOPPED
+    }
+
+    public enum WRIST_STATE {
+        MANUAL,
+        GO_TO_POS
+    }
+
+    public enum WRIST_SETPOINT {
+        UP,
+        DOWN,
+        STOW
     }
 
     public Intake(HardwareMap hwMap, boolean suppressEncoderReset) {
@@ -81,12 +92,18 @@ public class Intake implements IntakeConstants {
                 slideRawPower(0);
         }
 
-        intakeWristF.setPower( -wristPID.calculate( this.getWristServoPositions(), ( wristSetpoint ) ) );
+        switch (wristState) {
+            case MANUAL:
+                this.wristSetpoint = getWristServoPosition();
+                break;
+            case GO_TO_POS:
+                intakeWristF.setPower( -wristPID.calculate( this.getWristServoPosition(), ( wristSetpoint ) ) );
+        }
     }
 
     public int getIntakeSlidePos() { return slide.getCurrentPosition(); }
 
-    public double getWristServoPositions() {
+    public double getWristServoPosition() {
         return wristEncoder.getVoltage() / 3.3 * 360.0;
     }
 
@@ -95,7 +112,7 @@ public class Intake implements IntakeConstants {
         slide.setPower(power);
     }
 
-    public void manualControl(double power){
+    public void slideManual(double power){
        this.intakeState = INTAKE_STATE.MANUAL;
        //break for soft limit
        if ((!intakeZero.getState() || getIntakeSlidePos() < -1000) && power < 0) { return; }
@@ -103,6 +120,11 @@ public class Intake implements IntakeConstants {
        if( slide.getCurrent(CurrentUnit.AMPS) > SLIDE_CURRENT_LIMIT ) { slideRawPower(0.5 * power); return; }
 
        slideRawPower(power);
+    }
+
+    public void wristManual (double power) {
+        this.wristState = WRIST_STATE.MANUAL;
+        intakeWristF.setPower(power);
     }
 
     public void resetSlideEncoder(){
@@ -123,16 +145,16 @@ public class Intake implements IntakeConstants {
         this.intakeState = state;
     }
 
+    public void setWristState(WRIST_STATE state) {
+        this.wristState = state;
+    }
+
     public void runIntake(double power){
         intakeCR.setPower(power);
         //intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
-    public INTAKE_STATE getSlideState() {
-        return intakeState;
-    }
-
-    public void setWristSetpoint(WristState wristState){
+    public void setWristSetpoint(WRIST_SETPOINT wristState){
 
         switch( wristState )
         {
@@ -148,12 +170,8 @@ public class Intake implements IntakeConstants {
                 wristSetpoint = WRIST_STOW;
                 break;
         }
-    }
 
-    public enum WristState {
-        UP,
-        DOWN,
-        STOW
+        this.wristState = WRIST_STATE.GO_TO_POS;
     }
 
     public String getTelemetry() {
@@ -164,7 +182,7 @@ public class Intake implements IntakeConstants {
         telemBuilder.append("Intake Slide Real: ").append(getIntakeSlidePos()).append(lineSep);
         telemBuilder.append("Intake State: ").append(intakeState).append(lineSep);
         telemBuilder.append("Wrist Desired Pos: ").append(wristSetpoint).append(lineSep);
-        telemBuilder.append("Wrist Real: ").append(getWristServoPositions()).append(lineSep);
+        telemBuilder.append("Wrist Real: ").append(getWristServoPosition()).append(lineSep);
 
         return telemBuilder.toString();
     }

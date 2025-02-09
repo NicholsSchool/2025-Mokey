@@ -37,7 +37,7 @@ public class TestAuto extends LinearOpMode implements TestAutoConstants {
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.setMsTransmissionInterval(50);
 
-        drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0), 270, false);
+        drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0), 270, false, false);
         elevator = new Elevator(hardwareMap, false);
         intake = new Intake(hardwareMap, false);
 
