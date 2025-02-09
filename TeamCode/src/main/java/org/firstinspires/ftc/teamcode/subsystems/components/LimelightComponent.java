@@ -62,7 +62,7 @@ public class LimelightComponent {
         Log.i("LIMELIGHT_STDEV_X", String.valueOf(result.getStddevMt2()[0]));
         Log.i("LIMELIGHT_STDEV_Y", String.valueOf(result.getStddevMt2()[1]));
         return result.isValid() &&
-                Math.abs(result.getStddevMt2()[0]) < 0.2 && Math.abs(result.getStddevMt2()[1]) < 0.2;
+                Math.abs(result.getStddevMt2()[0]) < 0.1 && Math.abs(result.getStddevMt2()[1]) < 0.1;
     }
 
 }

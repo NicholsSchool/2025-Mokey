@@ -66,6 +66,7 @@ public class Intake implements IntakeConstants {
         wristEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
 
         wristSetpoint = WRIST_STOW;
+        wristState = WRIST_STATE.GO_TO_POS;
         wristPID = new PIDController( WRIST_P, 0.0, 0.0 );
 
         intakeSetpoint = 0.0;

@@ -52,7 +52,7 @@ public class OpticalSensor {
     }
 
     public Vector getPosDeltas() {
-        return new Vector(pos.x - lastPos.x, pos.y - lastPos.y);
+        return new Vector( ( pos.x - lastPos.x),  ( pos.y - lastPos.y) );
     }
 
     /**

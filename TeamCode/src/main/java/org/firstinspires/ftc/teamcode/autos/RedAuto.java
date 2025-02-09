@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-@Autonomous(name = "Blue Auto", group = "Auto")
+@Autonomous(name = "Red Auto", group = "Auto")
 public class RedAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
