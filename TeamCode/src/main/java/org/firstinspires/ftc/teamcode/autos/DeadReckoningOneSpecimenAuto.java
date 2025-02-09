@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode.autos;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.constants.ElevatorConstants;
 import org.firstinspires.ftc.teamcode.math_utils.Vector;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
@@ -10,19 +17,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * Testing Auto for Lerp
  */
-@Autonomous(name="Contest Auto", group="Testing")
-public class DeadReckoningAuto extends LinearOpMode{
+@Autonomous(name="[EMERGENCY] ONE SPECIMEN DEAD AUTO", group="EmergencyAutos")
+public class DeadReckoningOneSpecimenAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain drivetrain = new Drivetrain(hardwareMap, 0, 0, 0, false);
-        drivetrain.setFloat();
+        Drivetrain drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.INCH,0, 0, AngleUnit.DEGREES, 0), 0, false, false);
         ElapsedTime time = new ElapsedTime();
-        Elevator elevator = new Elevator(hardwareMap, drivetrain::getElevatorPosition);
+        Elevator elevator = new Elevator(hardwareMap, false);
 
         waitForStart();
 
-        drivetrain.setTargetHeading(drivetrain.getPose().angle);
+        drivetrain.setTargetHeading(drivetrain.getPose().getHeading(AngleUnit.DEGREES));
         elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY);
         while(time.time(TimeUnit.SECONDS) < 5.0){
             drivetrain.drive(new Vector(0.0,0.7), 0, true);
