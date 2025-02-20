@@ -57,15 +57,15 @@ public class Intake implements IntakeConstants {
 
         intakeCR.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        intakeWristF = hwMap.get(CRServoImplEx.class, "WristFront");
+        intakeWristF = hwMap.get(CRServoImplEx.class, "WristServo");
 
         intakeWristF.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intakeZero = hwMap.get(DigitalChannelImpl.class, "IntakeMagnet");
 
-        wristEncoder = hwMap.get(AnalogInput.class, "WristFrontEncoder");
+        wristEncoder = hwMap.get(AnalogInput.class, "WristEncoder");
 
-        wristSetpoint = WRIST_STOW;
+        wristSetpoint = WRIST_HANDOFF;
         wristState = WRIST_STATE.GO_TO_POS;
         wristPID = new PIDController( WRIST_P, 0.0, 0.0 );
 
@@ -155,22 +155,9 @@ public class Intake implements IntakeConstants {
         //intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
-    public void setWristSetpoint(WRIST_SETPOINT wristState){
+    public void setWristSetpoint(double wristSetpoint){
 
-        switch( wristState )
-        {
-            case UP:
-                wristSetpoint = WRIST_UP;
-                break;
-            case DOWN:
-                int slidePos = getIntakeSlidePos();
-                wristSetpoint = (WRIST_DOWN_A * slidePos * slidePos) + (WRIST_DOWN_B * slidePos) + WRIST_DOWN_C;
-                //quadratic regression
-                break;
-            case STOW:
-                wristSetpoint = WRIST_STOW;
-                break;
-        }
+        this.wristSetpoint = wristSetpoint;
 
         this.wristState = WRIST_STATE.GO_TO_POS;
     }

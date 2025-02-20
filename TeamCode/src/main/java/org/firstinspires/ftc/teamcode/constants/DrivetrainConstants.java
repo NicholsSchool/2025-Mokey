@@ -21,13 +21,13 @@ public interface DrivetrainConstants {
     double TURN_PROFILE_MAX = 0.5;
 
     /** Virtual Low Gear Max Speed */
-    double VIRTUAL_LOW_GEAR = 0.75;
+    double VIRTUAL_LOW_GEAR = 0.6;
 
     /** Virtual High Gear Max Speed */
     double VIRTUAL_HIGH_GEAR = 1;
 
     /** Auto Align Proportional Constant */
-    double AUTO_ALIGN_P = 0.45;
+    double AUTO_ALIGN_P = 0.15;
 
     /** Auto Align allowed error in radians (.5 degrees) */
     double AUTO_ALIGN_ERROR = 0.00872664625997;
@@ -47,7 +47,7 @@ public interface DrivetrainConstants {
     /** Drive Motor Integral Gain */
     double DRIVE_I = 6.0;
 
-    double GO_TO_POS_P = 0.25;
+    double GO_TO_POS_P = 0.2;
     double GO_TO_POS_I = 0.005;
     double GO_TO_POS_D = 0.012;
 }

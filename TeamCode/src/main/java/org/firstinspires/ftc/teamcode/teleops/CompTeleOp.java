@@ -94,15 +94,17 @@ public class CompTeleOp extends OpMode {
             intake.wristManual(-1);
         else intake.setWristState(Intake.WRIST_STATE.GO_TO_POS);
 
-        //WRIST SETPOINTS
-        if (controller2.triangle.isPressed() && intake.getIntakeSlidePos() < IntakeConstants.WAYPOINT_STOW) {
-            intake.setWristSetpoint(Intake.WRIST_SETPOINT.UP);
-        } else if (controller2.triangle.isPressed() && intake.getIntakeSlidePos() > IntakeConstants.WAYPOINT_STOW) {
-            intake.setWristSetpoint(Intake.WRIST_SETPOINT.DOWN);
-        } else {intake.setWristSetpoint(Intake.WRIST_SETPOINT.STOW); }
+        //AUTO HANDOFF
+        if (intake.getIntakeSlidePos() < IntakeConstants.WAYPOINT_STOW && !controller2.square.isPressed()) {
+            intake.setWristSetpoint(IntakeConstants.WRIST_HANDOFF);
+            elevator.setArmSetpoint(ElevatorConstants.ARM_HANDOFF);
+        } else if (intake.getIntakeSlidePos() > IntakeConstants.WAYPOINT_STOW && !controller2.square.isPressed()){
+            elevator.setArmSetpoint(ElevatorConstants.ARM_STOW);
+            intake.setWristSetpoint(IntakeConstants.WRIST_INTAKE);
+        }
 
         //ARM SETPOINTS
-        elevator.setArmSetpoint(controller2.square.isPressed() ? ElevatorConstants.ARM_BASKET : ElevatorConstants.ARM_HANDOFF);
+        if (controller2.square.isPressed()) elevator.setArmSetpoint(ElevatorConstants.ARM_BASKET);
 
         //INTAKE WHEEL
         intake.runIntake(controller2.leftTrigger.value() - controller2.rightTrigger.value());

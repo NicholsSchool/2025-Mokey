@@ -42,19 +42,20 @@ public class liteTesting extends OpMode {
 
         armEncoder = hardwareMap.get(AnalogInput.class, "ArmEncoder");
 
-        intakeWrist = hardwareMap.get(CRServoImplEx.class, "WristFront");
-        wristEncoder = hardwareMap.get(AnalogInput.class, "WristFrontEncoder");
+        intakeWrist = hardwareMap.get(CRServoImplEx.class, "WristServo");
+        wristEncoder = hardwareMap.get(AnalogInput.class, "WristEncoder");
     }
 
     @Override
     public void loop() {
 
-        slide.setPower(gamepad1.left_stick_y);
-        intakeWrist.setPower(gamepad1.right_stick_y);
+        leftArm.setPower(gamepad1.left_stick_y);
+        rightArm.setPower(-gamepad1.left_stick_y);
 
         telemetry.addData("Elevator Real", rightClimbMotor.getCurrentPosition());
         telemetry.addData("Intake Real", slide.getCurrentPosition());
         telemetry.addData("Wrist Real", (wristEncoder.getVoltage() / 3.3 * 360.0));
+        telemetry.addData("Arm Real", (armEncoder.getVoltage() / 3.3 * 360.0));
         telemetry.update();
 
     }

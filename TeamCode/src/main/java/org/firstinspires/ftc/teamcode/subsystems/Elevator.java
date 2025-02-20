@@ -53,7 +53,7 @@ public class Elevator implements ElevatorConstants {
         if (!suppressEncoderReset) resetSlideEncoder();
 
         elevatorSetpoint = 0.0;
-        armSetpoint = ARM_DOWN;
+        armSetpoint = ARM_STOW;
         elevatorPID = new PIDController(SLIDE_P, 0.0, 0.0);
         armPID = new PIDController(ARM_P, 0.0, 0.0);
         this.state = ELEVATOR_STATE.GO_TO_POS;

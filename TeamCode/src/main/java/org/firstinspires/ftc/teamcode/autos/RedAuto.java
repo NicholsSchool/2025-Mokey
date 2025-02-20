@@ -28,7 +28,7 @@ public class RedAuto extends LinearOpMode {
 
         Drivetrain drivetrain = new Drivetrain(
                 hardwareMap,
-                new Pose2D(DistanceUnit.INCH,16, -61, AngleUnit.RADIANS, 0),
+                new Pose2D(DistanceUnit.INCH,12, -61, AngleUnit.DEGREES, 180),
                 270, true, false
         );
 
@@ -71,7 +71,7 @@ public class RedAuto extends LinearOpMode {
         elevator.setArmSetpoint(ElevatorConstants.ARM_HANDOFF);
 
         //Drive to chamber and set elevator to ready position
-        actionSet.add( () -> drivetrain.driveToPose(new Pose2D(DistanceUnit.INCH, -5.5, -35, AngleUnit.RADIANS, 180), true) );
+        actionSet.add( () -> drivetrain.driveToPose(new Pose2D(DistanceUnit.INCH, -5.5, -35, AngleUnit.DEGREES, 180), true) );
         actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY ) );
         AutoUtil.runActionsConcurrent(actionSet, methodSet1, TimeUnit.SECONDS, 4);
         drivetrain.stop();
@@ -115,7 +115,7 @@ public class RedAuto extends LinearOpMode {
 
         //Push block 1 to observation
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 46, -55, AngleUnit.DEGREES, 90), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 46, -48, AngleUnit.DEGREES, 90), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
         drivetrain.stop();
 
@@ -136,13 +136,13 @@ public class RedAuto extends LinearOpMode {
 
         //Wait for HP
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 38, -48, AngleUnit.DEGREES, 180), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 42, -48, AngleUnit.DEGREES, 180), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
         drivetrain.stop();
 
         //Get ready for wall pick 1
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 38, -52, AngleUnit.DEGREES, 180), true ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 42, -52, AngleUnit.DEGREES, 180), true ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 
 for (int i = 0; i < 2; i++) {
@@ -159,13 +159,13 @@ for (int i = 0; i < 2; i++) {
         //Pull specimen up and run to chamber
         actionSet.clear();
         int finalI = i;
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, (-5.5 + (finalI * 2)), -35, AngleUnit.DEGREES, 0), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, (-3.5 + (finalI * 2)), -35, AngleUnit.DEGREES, 0), false ) );
         actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY));
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5 );
         drivetrain.stop();
 
         //Push into submersible quickly
-        drivetrain.drive(new Vector(0.0, 0.5), 0.0, false);
+        drivetrain.drive(new Vector(0.0, -0.5), 0.0, false);
         AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.05);
         drivetrain.drive(new Vector(0.0, 0.0), 0.0, false);
         drivetrain.stop();
@@ -179,13 +179,13 @@ for (int i = 0; i < 2; i++) {
         //Bring down elevator and go to HP
         actionSet.clear();
         actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.WAYPOINT_ZERO));
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 38, -48, AngleUnit.DEGREES, 180), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 42, -48, AngleUnit.DEGREES, 180), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
         drivetrain.stop();
 
         //Get ready for wall pick
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 38, -52, AngleUnit.DEGREES, 180), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 42, -52, AngleUnit.DEGREES, 180), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         drivetrain.stop();
         }

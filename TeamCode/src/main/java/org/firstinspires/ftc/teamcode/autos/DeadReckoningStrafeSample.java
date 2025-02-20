@@ -22,7 +22,7 @@ public class DeadReckoningStrafeSample extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Drivetrain drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.INCH,0, 0, AngleUnit.DEGREES, 0), 0, false, false);
+        Drivetrain drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.INCH,0, 0, AngleUnit.DEGREES, 0), 270, false, false);
         ElapsedTime time = new ElapsedTime();
         Elevator elevator = new Elevator(hardwareMap, false);
 
