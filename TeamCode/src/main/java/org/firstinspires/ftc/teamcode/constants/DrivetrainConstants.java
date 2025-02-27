@@ -50,4 +50,11 @@ public interface DrivetrainConstants {
     double GO_TO_POS_P = 0.2;
     double GO_TO_POS_I = 0.005;
     double GO_TO_POS_D = 0.012;
+
+    double X_TICK_MULTIPLIER = 1;
+    double Y_TICK_MULTIPLIER = 1;
+    double TICKS_PER_DEGREE_X = 1;
+
+    double TICKS_PER_DEGREE_Y = 1;
+
 }

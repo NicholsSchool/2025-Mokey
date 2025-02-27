@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.math_utils;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.constants.DrivetrainConstants;
 import org.firstinspires.ftc.teamcode.subsystems.components.LimelightComponent;
 import org.firstinspires.ftc.teamcode.subsystems.components.OpticalSensor;
 
@@ -13,7 +15,7 @@ import java.util.Optional;
 /**
  * The Robot Pose (x, y, theta)
  */
-public class PoseEstimator {
+public class PoseEstimator implements DrivetrainConstants {
     public Pose2D initialPose;
 
     public Pose2D robotPose;
@@ -22,6 +24,11 @@ public class PoseEstimator {
 
     public OpticalSensor otos;
 
+    public DcMotor odomX, odomY;
+
+    public double currentXTicks = 0.0;
+    public double currentYTicks = 0.0;
+    public double previousHeading = 0.0;
     public boolean useLL;
 
     public boolean isUsingLL;
@@ -32,6 +39,13 @@ public class PoseEstimator {
      * @param initialPose Pose2D for robot's initial field-relative position.
      */
     public PoseEstimator(HardwareMap hwMap, Pose2D initialPose, boolean useLL, boolean suppressOTOSReset) {
+        odomX = hwMap.get(DcMotor.class, "RightDriveMotor");
+        odomY = hwMap.get(DcMotor.class, "BackDriveMotor");
+        odomX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odomX.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        odomY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        odomY.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         this.useLL = useLL;
         Optional<Point> LLPose = Optional.empty();
         otos = new OpticalSensor("OTOS", hwMap, DistanceUnit.METER, AngleUnit.DEGREES, suppressOTOSReset);
@@ -65,7 +79,17 @@ public class PoseEstimator {
     }
 
     public Pose2D getPose() { return robotPose; }
+    // run through transform FO for the actual one
+    public Vector getOdomDeltas(){
+        Vector deltas = new Vector(( (currentXTicks - odomX.getCurrentPosition()) - ((previousHeading - getFieldHeading(AngleUnit.DEGREES)) * TICKS_PER_DEGREE_X)) * X_TICK_MULTIPLIER,
+                ( (currentYTicks - odomY.getCurrentPosition()) - ((previousHeading - getFieldHeading(AngleUnit.DEGREES)) * TICKS_PER_DEGREE_Y)) * Y_TICK_MULTIPLIER);
+        currentXTicks = odomX.getCurrentPosition();
+        currentYTicks = odomY.getCurrentPosition();
+        previousHeading = getFieldHeading(AngleUnit.DEGREES);
 
+        return deltas;
+
+    }
     public boolean isUsingLL() { return isUsingLL; }
 
     public void update() {
