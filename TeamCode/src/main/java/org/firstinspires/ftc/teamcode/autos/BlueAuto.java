@@ -71,14 +71,14 @@ public class BlueAuto extends LinearOpMode {
         elevator.setArmSetpoint(ElevatorConstants.ARM_HANDOFF);
 
         //Drive to chamber and set elevator to ready position
-        actionSet.add( () -> drivetrain.driveToPose(new Pose2D(DistanceUnit.INCH, 2.5, 35, AngleUnit.RADIANS, 0), false) );
+        actionSet.add( () -> drivetrain.driveToPose(new Pose2D(DistanceUnit.INCH, 2.5, 26, AngleUnit.RADIANS, 0), false) );
         actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY ) );
         AutoUtil.runActionsConcurrent(actionSet, methodSet1, TimeUnit.SECONDS, 4);
         drivetrain.stop();
 
         //Push into submersible quickly
         drivetrain.drive(new Vector(0.0, 0.5), 0.0, false);
-        AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.05);
+        AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.1);
         drivetrain.drive(new Vector(0.0, 0.0), 0.0, false);
         drivetrain.stop();
 
@@ -142,7 +142,7 @@ public class BlueAuto extends LinearOpMode {
 
         //Get ready for wall pick 1
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -42, 52, AngleUnit.DEGREES, 0), true ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -42, 56, AngleUnit.DEGREES, 0), true ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
 
 for (int i = 0; i < 2; i++) {
@@ -151,22 +151,22 @@ for (int i = 0; i < 2; i++) {
         AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.6);
 
         //Slam into wall for pick 1
-        drivetrain.drive(new Vector(0.0, -0.7), 0.0, false);
-        AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.05);
-        drivetrain.drive(new Vector(0.0, 0.0), 0.0, false);
+        actionSet.clear();
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -42, 60, AngleUnit.DEGREES, 0), false ) );
+        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 0.1 );
         drivetrain.stop();
 
         //Pull specimen up and run to chamber
         actionSet.clear();
         int finalI = i;
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, (1.5 - (finalI * 2)), 35, AngleUnit.DEGREES, 180), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, (1.5 - (finalI * 2)), 26, AngleUnit.DEGREES, 180), false ) );
         actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.SPECIMEN_READY));
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5 );
         drivetrain.stop();
 
         //Push into submersible quickly
         drivetrain.drive(new Vector(0.0, 0.5), 0.0, false);
-        AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.05);
+        AutoUtil.runTimedLoop(methodSet1, TimeUnit.SECONDS, 0.1);
         drivetrain.drive(new Vector(0.0, 0.0), 0.0, false);
         drivetrain.stop();
 
@@ -185,7 +185,7 @@ for (int i = 0; i < 2; i++) {
 
         //Get ready for wall pick
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -42, 52, AngleUnit.DEGREES, 0), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -42, 56, AngleUnit.DEGREES, 0), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         drivetrain.stop();
         }
