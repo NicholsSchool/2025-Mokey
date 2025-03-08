@@ -54,7 +54,7 @@ public class Elevator implements ElevatorConstants {
 
         elevatorSetpoint = 0.0;
         armSetpoint = ARM_STOW;
-        elevatorPID = new PIDController(SLIDE_P, 0.0, 0.0);
+        elevatorPID = new PIDController(SLIDE_P, SLIDE_I, SLIDE_D);
         armPID = new PIDController(ARM_P, 0.0, 0.0);
         this.state = ELEVATOR_STATE.GO_TO_POS;
     }
@@ -91,8 +91,13 @@ public class Elevator implements ElevatorConstants {
         } else { return AutoUtil.AutoActionState.RUNNING; }
     }
 
-    public void setArmSetpoint(double setpoint) {
+    public AutoUtil.AutoActionState setArmSetpoint(double setpoint) {
+
+        if (Math.abs(getArmPosition() - setpoint) < 5) return AutoUtil.AutoActionState.FINISHED;
+
         this.armSetpoint = setpoint;
+
+        return AutoUtil.AutoActionState.RUNNING;
     }
 
     public void manualControl(double power)

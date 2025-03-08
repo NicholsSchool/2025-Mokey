@@ -155,11 +155,15 @@ public class Intake implements IntakeConstants {
         //intakeTwo.setPower(power * INTAKE_SPEED);
     }
 
-    public void setWristSetpoint(double wristSetpoint){
+    public AutoUtil.AutoActionState setWristSetpoint(double wristSetpoint){
+
+        if (Math.abs(getWristServoPosition() - wristSetpoint) < 5) return AutoUtil.AutoActionState.FINISHED;
 
         this.wristSetpoint = wristSetpoint;
 
         this.wristState = WRIST_STATE.GO_TO_POS;
+
+        return AutoUtil.AutoActionState.RUNNING;
     }
 
     public String getTelemetry() {

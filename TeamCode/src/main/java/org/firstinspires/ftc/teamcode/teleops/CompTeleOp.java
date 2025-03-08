@@ -89,22 +89,28 @@ public class CompTeleOp extends OpMode {
 
         //WRIST MANUAL
         if( controller2.dpadUp.isPressed() )
-            intake.wristManual(1);
-        else if( controller2.dpadDown.wasJustPressed())
             intake.wristManual(-1);
+        else if( controller2.dpadDown.wasJustPressed())
+            intake.wristManual(1);
         else intake.setWristState(Intake.WRIST_STATE.GO_TO_POS);
 
         //AUTO HANDOFF
-        if (intake.getIntakeSlidePos() < IntakeConstants.WAYPOINT_STOW && !controller2.square.isPressed()) {
+        if (intake.getIntakeSlidePos() < IntakeConstants.WAYPOINT_STOW && !controller2.triangle.isPressed()) {
             intake.setWristSetpoint(IntakeConstants.WRIST_HANDOFF);
-            elevator.setArmSetpoint(ElevatorConstants.ARM_HANDOFF);
-        } else if (intake.getIntakeSlidePos() > IntakeConstants.WAYPOINT_STOW && !controller2.square.isPressed()){
-            elevator.setArmSetpoint(ElevatorConstants.ARM_STOW);
+        } else if (intake.getIntakeSlidePos() > IntakeConstants.WAYPOINT_STOW && !controller2.triangle.isPressed()){
             intake.setWristSetpoint(IntakeConstants.WRIST_INTAKE);
+        } else if (controller2.triangle.isPressed()) {
+            intake.setWristSetpoint(180.0);
         }
 
         //ARM SETPOINTS
-        if (controller2.square.isPressed()) elevator.setArmSetpoint(ElevatorConstants.ARM_BASKET);
+        if (controller2.square.isPressed()) {
+            elevator.setArmSetpoint(ElevatorConstants.ARM_BASKET);
+        } else if (controller2.circle.isPressed()) {
+            elevator.setArmSetpoint(ElevatorConstants.ARM_HANDOFF);
+        } else {
+            elevator.setArmSetpoint(ElevatorConstants.ARM_STOW);
+        }
 
         //INTAKE WHEEL
         intake.runIntake(controller2.leftTrigger.value() - controller2.rightTrigger.value());

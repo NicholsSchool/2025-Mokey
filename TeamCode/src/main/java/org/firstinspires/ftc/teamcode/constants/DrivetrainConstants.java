@@ -27,7 +27,7 @@ public interface DrivetrainConstants {
     double VIRTUAL_HIGH_GEAR = 1;
 
     /** Auto Align Proportional Constant */
-    double AUTO_ALIGN_P = 0.15;
+    double AUTO_ALIGN_P = 0.3;
 
     /** Auto Align allowed error in radians (.5 degrees) */
     double AUTO_ALIGN_ERROR = 0.00872664625997;
@@ -49,7 +49,7 @@ public interface DrivetrainConstants {
 
     double GO_TO_POS_P = 0.2;
     double GO_TO_POS_I = 0.005;
-    double GO_TO_POS_D = 0.012;
+    double GO_TO_POS_D = 0.016;
 
     double X_TICK_MULTIPLIER = 1;
     double Y_TICK_MULTIPLIER = 1;
