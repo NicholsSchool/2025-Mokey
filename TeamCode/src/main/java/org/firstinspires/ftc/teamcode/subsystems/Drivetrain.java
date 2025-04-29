@@ -26,7 +26,7 @@ public class Drivetrain implements DrivetrainConstants {
     public IndicatorLight leftLight, rightLight;
     private final VectorMotionProfile driveProfile;
     private final MotionProfile turnProfile;
-    private final SimpleFeedbackController turnController;
+    private final PIDController turnController;
     public PoseEstimator poseEstimator;
     private double targetHeading;
     private final double fieldOrientedForward;
@@ -75,7 +75,7 @@ public class Drivetrain implements DrivetrainConstants {
 
         driveProfile = new VectorMotionProfile(DRIVE_PROFILE_SPEED);
         turnProfile = new MotionProfile(TURN_PROFILE_SPEED, TURN_PROFILE_MAX);
-        turnController = new SimpleFeedbackController(AUTO_ALIGN_P);
+        turnController = new PIDController(AUTO_ALIGN_P, 0.0, 0.0);
     }
 
     public void update() {
@@ -115,6 +115,11 @@ public class Drivetrain implements DrivetrainConstants {
         return Math.abs(error) < AUTO_ALIGN_ERROR ? 0.0 : error / 3;
     }
 
+    public double newTurnToAngle() {
+        double error = Angles.clipRadians(poseEstimator.getPose().getHeading(AngleUnit.RADIANS) - targetHeading);
+        return turnController.calculate(error, 0);
+    }
+
     public AutoUtil.AutoActionState driveToPose(Pose2D targetPose, boolean lowGear){
         this.setpoint = targetPose;
 
@@ -146,7 +151,7 @@ public class Drivetrain implements DrivetrainConstants {
 
         setTargetHeading(targetPose.getHeading(AngleUnit.RADIANS));
 
-        autoDrive(driveInput, turnToAngle(), lowGear);
+        autoDrive(driveInput, newTurnToAngle(), lowGear);
 
         return AutoUtil.AutoActionState.RUNNING;
     }

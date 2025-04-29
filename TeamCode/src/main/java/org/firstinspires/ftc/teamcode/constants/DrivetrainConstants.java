@@ -9,28 +9,30 @@ public interface DrivetrainConstants {
     double DRIVE_SETPOINT_THRESHOLD = 1.2;
 
     /* The threshold at which to stop auto-aligning in driveToPose */
-    double TURN_SETPOINT_THRESHOLD = 10.0;
+    double TURN_SETPOINT_THRESHOLD = 5.0;
 
     /** The Maximum Speed of the Driving Profile */
     double DRIVE_PROFILE_SPEED = 10.0;
 
     /** The Maximum Speed of the Turning Profile */
-    double TURN_PROFILE_SPEED = 5.0;
+    double TURN_PROFILE_SPEED = 3.5;
 
     /** The Maximum Output Value Magnitude of the Turning Profile */
     double TURN_PROFILE_MAX = 0.5;
 
     /** Virtual Low Gear Max Speed */
-    double VIRTUAL_LOW_GEAR = 0.6;
+    double VIRTUAL_LOW_GEAR = 0.75;
 
     /** Virtual High Gear Max Speed */
     double VIRTUAL_HIGH_GEAR = 1;
 
-    /** Auto Align Proportional Constant */
-    double AUTO_ALIGN_P = 0.3;
+    /** Auto Align PID */
+    double AUTO_ALIGN_P = 40;
+    double AUTO_ALIGN_I = 0.0;
+    double AUTO_ALIGN_D = 0.0;
 
     /** Auto Align allowed error in radians (.5 degrees) */
-    double AUTO_ALIGN_ERROR = 0.00872664625997;
+    double AUTO_ALIGN_ERROR = Math.toRadians(0.5);
 
     /** Left Drive Wheel Angle Offset (30 degrees) */
     double LEFT_DRIVE_OFFSET = Math.PI / 6.0;

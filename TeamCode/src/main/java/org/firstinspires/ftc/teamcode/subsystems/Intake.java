@@ -116,10 +116,7 @@ public class Intake implements IntakeConstants {
     public void slideManual(double power){
        this.intakeState = INTAKE_STATE.MANUAL;
        //break for soft limit
-       if ((!intakeZero.getState() || getIntakeSlidePos() < -1000) && power < 0) { return; }
-       //half power throttle for overcurrent
-       if( slide.getCurrent(CurrentUnit.AMPS) > SLIDE_CURRENT_LIMIT ) { slideRawPower(0.5 * power); return; }
-
+       if ((getIntakeSlidePos() < 0) && power < 0) { return; }
        slideRawPower(power);
     }
 

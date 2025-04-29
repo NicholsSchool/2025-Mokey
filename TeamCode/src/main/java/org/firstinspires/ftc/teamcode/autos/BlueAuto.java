@@ -105,19 +105,19 @@ public class BlueAuto extends LinearOpMode {
 
         //Get behind the blocks
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -34.5, 10, AngleUnit.DEGREES, 0 ), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -34.5, 16, AngleUnit.DEGREES, 0 ), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         drivetrain.stop();
 
         //Strafe to behind block 1
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -44, 10, AngleUnit.DEGREES, 0), true ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -44, 16, AngleUnit.DEGREES, 0), true ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         drivetrain.stop();
 
         //Push block 1 to observation
         actionSet.clear();
-        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -48, 48, AngleUnit.DEGREES, 0), false ) );
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -48, 52, AngleUnit.DEGREES, 0), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 3 );
         drivetrain.stop();
 
@@ -169,6 +169,11 @@ for (int i = 0; i < 2; i++) {
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         drivetrain.stop();
 
+        //pull away from chamber
+        actionSet.clear();
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -2.5, 40, AngleUnit.DEGREES, 0), false ) );
+        AutoUtil.runActionsConcurrent(actionSet, methodSet1, TimeUnit.SECONDS, 1);
+
         //Bring down elevator and go to HP
         actionSet.clear();
         actionSet.add( () -> elevator.setElevatorSetpoint(ElevatorConstants.WAYPOINT_ZERO));
@@ -182,6 +187,11 @@ for (int i = 0; i < 2; i++) {
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 1 );
         drivetrain.stop();
         }
+
+actionSet.clear();
+actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, -60, 60, AngleUnit.DEGREES, 0), false ) );
+AutoUtil.runActionsConcurrent(actionSet, methodSet1, TimeUnit.SECONDS, 2);
+drivetrain.stop();
 
     }
 }

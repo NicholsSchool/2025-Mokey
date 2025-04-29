@@ -73,6 +73,18 @@ public class TestAuto extends LinearOpMode implements TestAutoConstants {
         if (!RUN_DRIVETRAIN_TESTS) return;
 
         actionSet.clear();
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 90 ), false ) );
+        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
+
+        actionSet.clear();
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 180 ), false ) );
+        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
+
+        actionSet.clear();
+        actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, 0, AngleUnit.DEGREES, 0 ), false ) );
+        AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
+
+        actionSet.clear();
         actionSet.add( () -> drivetrain.driveToPose( new Pose2D( DistanceUnit.INCH, 0, -48, AngleUnit.DEGREES, 0 ), false ) );
         AutoUtil.runActionsConcurrent( actionSet, methodSet1, TimeUnit.SECONDS, 5);
 

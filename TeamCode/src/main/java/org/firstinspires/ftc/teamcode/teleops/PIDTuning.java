@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Intake;
 @TeleOp(name = "PIDTuning", group = "Dev")
 public class PIDTuning extends OpMode {
 
+    private Drivetrain drivetrain;
     private Intake intake;
     private Elevator elevator;
     private Controller controller1;
@@ -27,9 +28,12 @@ public class PIDTuning extends OpMode {
 
     public void init() {
 
+        drivetrain = new Drivetrain(hardwareMap, new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.DEGREES, 0), 270, false, false);
         intake = new Intake(hardwareMap, false);
         elevator = new Elevator(hardwareMap, false);
         controller1 = new Controller( gamepad1 );
+
+
 
         dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
@@ -41,6 +45,8 @@ public class PIDTuning extends OpMode {
 
         controller1.update();
 
+        drivetrain.driveToPose(new Pose2D(DistanceUnit.METER, 0, 0, AngleUnit.DEGREES, (controller1.square.isPressed() ? 90 : 0)), false);
+
         intake.setIntakeSetpoint(controller1.triangle.isPressed() ? IntakeConstants.WAYPOINT_EXTEND : IntakeConstants.WAYPOINT_RETRACT);
 
         elevator.setElevatorSetpoint( controller1.x.isPressed() ? -1000 : -200);
@@ -49,8 +55,11 @@ public class PIDTuning extends OpMode {
         telemetry.addData("intake real", -intake.getIntakeSlidePos());
         telemetry.addData("elevator desired", controller1.x.isPressed() ? -1000 : -200);
         telemetry.addData("elevator real", elevator.getEncoderPosition());
+        telemetry.addData("drive desired", controller1.square.isPressed() ? 90 : 0);
+        telemetry.addData("drive real", drivetrain.getPose().getHeading(AngleUnit.DEGREES));
 
         //intake.periodic();
+        drivetrain.update();
         elevator.periodic();
 
     }
