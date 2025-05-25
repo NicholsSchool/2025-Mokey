@@ -27,7 +27,7 @@ public interface DrivetrainConstants {
     double VIRTUAL_HIGH_GEAR = 1;
 
     /** Auto Align PID */
-    double AUTO_ALIGN_P = 40;
+    double AUTO_ALIGN_P = 0.03;
     double AUTO_ALIGN_I = 0.0;
     double AUTO_ALIGN_D = 0.0;
 
